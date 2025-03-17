@@ -43,8 +43,8 @@ async function initGame() {
         populateCategories();
         setupEventListeners();
 
-        // Select all categories by default
-        selectAllCategories();
+        // Start with all categories unselected
+        gameState.selectedCategories = [];
         hideLoading();
     } catch (error) {
         console.error('Error initializing game:', error);
