@@ -1,0 +1,12 @@
+날씨 → nalssi → Weather
+비 → bi → Rain
+눈 → nun → Snow
+구름 → gureum → Cloud
+해 → hae → Sun
+바람 → baram → Wind
+폭풍 → pokpoong → Storm
+번개 → beongae → Lightning
+천둥 → cheondung → Thunder
+산 → san → Mountain
+바다 → bada → Sea
+강 → gang → River

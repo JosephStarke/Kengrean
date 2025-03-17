@@ -1,0 +1,12 @@
+빨강 → ppalgang → Red
+파랑 → parang → Blue
+노랑 → norang → Yellow
+초록 → chorok → Green
+검정 → geomjeong → Black
+흰색 → huinsaek → White
+주황 → juhwang → Orange
+분홍 → bunhong → Pink
+보라 → bora → Purple
+갈색 → galsaek → Brown
+회색 → hoesaek → Gray
+금색 → geumsaek → Gold
