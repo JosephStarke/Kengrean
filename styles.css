@@ -381,27 +381,28 @@ button.active {
 }
 
 .category-bubble {
-    background-color: var(--incorrect);
+    background-color: #505050;
     padding: 18px;
     border-radius: 20px;
-    box-shadow: 0 8px 0 rgba(220, 53, 69, 0.3);
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     transform-style: preserve-3d;
     font-size: 1.2rem;
     font-weight: bold;
-    color: white;
+    color: #E0E0E0;
 }
 
 .category-item:hover .category-bubble {
     transform: translateY(-8px) rotateX(10deg);
-    box-shadow: 0 16px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 16px 0 rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
 }
 
 .category-item.selected .category-bubble {
-    background-color: white;
+    background-color: var(--accent);
     color: var(--dark);
-    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1),
-        0 0 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 0 rgba(255, 230, 109, 0.5),
+        0 0 15px rgba(255, 230, 109, 0.3);
     animation: selected-pop 0.5s ease;
 }
 
