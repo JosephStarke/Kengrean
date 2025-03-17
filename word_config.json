@@ -1,0 +1,671 @@
+{
+  "categories": [
+    "basics",
+    "colors",
+    "food",
+    "nature",
+    "numbers",
+    "travel",
+    "verbs"
+  ],
+  "words": {
+    "basics": [
+      {
+        "index": "000",
+        "english": "Hello",
+        "korean": "안녕하세요",
+        "audioEn": "English Words/basics/000_Hello.mp3",
+        "audioKo": "Korean Words/basics/000_안녕하세요.mp3"
+      },
+      {
+        "index": "001",
+        "english": "Thank you",
+        "korean": "감사합니다",
+        "audioEn": "English Words/basics/001_Thank you.mp3",
+        "audioKo": "Korean Words/basics/001_감사합니다.mp3"
+      },
+      {
+        "index": "002",
+        "english": "I'm sorry",
+        "korean": "미안합니다",
+        "audioEn": "English Words/basics/002_I'm sorry.mp3",
+        "audioKo": "Korean Words/basics/002_미안합니다.mp3"
+      },
+      {
+        "index": "003",
+        "english": "Yes",
+        "korean": "네",
+        "audioEn": "English Words/basics/003_Yes.mp3",
+        "audioKo": "Korean Words/basics/003_네.mp3"
+      },
+      {
+        "index": "004",
+        "english": "No",
+        "korean": "아니요",
+        "audioEn": "English Words/basics/004_No.mp3",
+        "audioKo": "Korean Words/basics/004_아니요.mp3"
+      },
+      {
+        "index": "005",
+        "english": "Name",
+        "korean": "이름",
+        "audioEn": "English Words/basics/005_Name.mp3",
+        "audioKo": "Korean Words/basics/005_이름.mp3"
+      },
+      {
+        "index": "006",
+        "english": "Where",
+        "korean": "어디",
+        "audioEn": "English Words/basics/006_Where.mp3",
+        "audioKo": "Korean Words/basics/006_어디.mp3"
+      },
+      {
+        "index": "007",
+        "english": "How much",
+        "korean": "얼마",
+        "audioEn": "English Words/basics/007_How much.mp3",
+        "audioKo": "Korean Words/basics/007_얼마.mp3"
+      },
+      {
+        "index": "008",
+        "english": "Time",
+        "korean": "시간",
+        "audioEn": "English Words/basics/008_Time.mp3",
+        "audioKo": "Korean Words/basics/008_시간.mp3"
+      },
+      {
+        "index": "009",
+        "english": "Today",
+        "korean": "오늘",
+        "audioEn": "English Words/basics/009_Today.mp3",
+        "audioKo": "Korean Words/basics/009_오늘.mp3"
+      },
+      {
+        "index": "010",
+        "english": "Tomorrow",
+        "korean": "내일",
+        "audioEn": "English Words/basics/010_Tomorrow.mp3",
+        "audioKo": "Korean Words/basics/010_내일.mp3"
+      },
+      {
+        "index": "011",
+        "english": "GoodNice",
+        "korean": "좋아요",
+        "audioEn": "English Words/basics/011_GoodNice.mp3",
+        "audioKo": "Korean Words/basics/011_좋아요.mp3"
+      }
+    ],
+    "colors": [
+      {
+        "index": "000",
+        "english": "Red",
+        "korean": "빨강",
+        "audioEn": "English Words/colors/000_Red.mp3",
+        "audioKo": "Korean Words/colors/000_빨강.mp3"
+      },
+      {
+        "index": "001",
+        "english": "Blue",
+        "korean": "파랑",
+        "audioEn": "English Words/colors/001_Blue.mp3",
+        "audioKo": "Korean Words/colors/001_파랑.mp3"
+      },
+      {
+        "index": "002",
+        "english": "Yellow",
+        "korean": "노랑",
+        "audioEn": "English Words/colors/002_Yellow.mp3",
+        "audioKo": "Korean Words/colors/002_노랑.mp3"
+      },
+      {
+        "index": "003",
+        "english": "Green",
+        "korean": "초록",
+        "audioEn": "English Words/colors/003_Green.mp3",
+        "audioKo": "Korean Words/colors/003_초록.mp3"
+      },
+      {
+        "index": "004",
+        "english": "Black",
+        "korean": "검정",
+        "audioEn": "English Words/colors/004_Black.mp3",
+        "audioKo": "Korean Words/colors/004_검정.mp3"
+      },
+      {
+        "index": "005",
+        "english": "White",
+        "korean": "흰색",
+        "audioEn": "English Words/colors/005_White.mp3",
+        "audioKo": "Korean Words/colors/005_흰색.mp3"
+      },
+      {
+        "index": "006",
+        "english": "Orange",
+        "korean": "주황",
+        "audioEn": "English Words/colors/006_Orange.mp3",
+        "audioKo": "Korean Words/colors/006_주황.mp3"
+      },
+      {
+        "index": "007",
+        "english": "Pink",
+        "korean": "분홍",
+        "audioEn": "English Words/colors/007_Pink.mp3",
+        "audioKo": "Korean Words/colors/007_분홍.mp3"
+      },
+      {
+        "index": "008",
+        "english": "Purple",
+        "korean": "보라",
+        "audioEn": "English Words/colors/008_Purple.mp3",
+        "audioKo": "Korean Words/colors/008_보라.mp3"
+      },
+      {
+        "index": "009",
+        "english": "Brown",
+        "korean": "갈색",
+        "audioEn": "English Words/colors/009_Brown.mp3",
+        "audioKo": "Korean Words/colors/009_갈색.mp3"
+      },
+      {
+        "index": "010",
+        "english": "Gray",
+        "korean": "회색",
+        "audioEn": "English Words/colors/010_Gray.mp3",
+        "audioKo": "Korean Words/colors/010_회색.mp3"
+      },
+      {
+        "index": "011",
+        "english": "Gold",
+        "korean": "금색",
+        "audioEn": "English Words/colors/011_Gold.mp3",
+        "audioKo": "Korean Words/colors/011_금색.mp3"
+      }
+    ],
+    "food": [
+      {
+        "index": "000",
+        "english": "Rice",
+        "korean": "밥",
+        "audioEn": "English Words/food/000_Rice.mp3",
+        "audioKo": "Korean Words/food/000_밥.mp3"
+      },
+      {
+        "index": "001",
+        "english": "Water",
+        "korean": "물",
+        "audioEn": "English Words/food/001_Water.mp3",
+        "audioKo": "Korean Words/food/001_물.mp3"
+      },
+      {
+        "index": "002",
+        "english": "Coffee",
+        "korean": "커피",
+        "audioEn": "English Words/food/002_Coffee.mp3",
+        "audioKo": "Korean Words/food/002_커피.mp3"
+      },
+      {
+        "index": "003",
+        "english": "Kimchi",
+        "korean": "김치",
+        "audioEn": "English Words/food/003_Kimchi.mp3",
+        "audioKo": "Korean Words/food/003_김치.mp3"
+      },
+      {
+        "index": "004",
+        "english": "Meat",
+        "korean": "고기",
+        "audioEn": "English Words/food/004_Meat.mp3",
+        "audioKo": "Korean Words/food/004_고기.mp3"
+      },
+      {
+        "index": "005",
+        "english": "Fish",
+        "korean": "생선",
+        "audioEn": "English Words/food/005_Fish.mp3",
+        "audioKo": "Korean Words/food/005_생선.mp3"
+      },
+      {
+        "index": "006",
+        "english": "Vegetables",
+        "korean": "야채",
+        "audioEn": "English Words/food/006_Vegetables.mp3",
+        "audioKo": "Korean Words/food/006_야채.mp3"
+      },
+      {
+        "index": "007",
+        "english": "Fruit",
+        "korean": "과일",
+        "audioEn": "English Words/food/007_Fruit.mp3",
+        "audioKo": "Korean Words/food/007_과일.mp3"
+      },
+      {
+        "index": "008",
+        "english": "Beer",
+        "korean": "맥주",
+        "audioEn": "English Words/food/008_Beer.mp3",
+        "audioKo": "Korean Words/food/008_맥주.mp3"
+      },
+      {
+        "index": "009",
+        "english": "Soju",
+        "korean": "소주",
+        "audioEn": "English Words/food/009_Soju.mp3",
+        "audioKo": "Korean Words/food/009_소주.mp3"
+      },
+      {
+        "index": "010",
+        "english": "Noodles",
+        "korean": "국수",
+        "audioEn": "English Words/food/010_Noodles.mp3",
+        "audioKo": "Korean Words/food/010_국수.mp3"
+      },
+      {
+        "index": "011",
+        "english": "Bread",
+        "korean": "빵",
+        "audioEn": "English Words/food/011_Bread.mp3",
+        "audioKo": "Korean Words/food/011_빵.mp3"
+      }
+    ],
+    "nature": [
+      {
+        "index": "000",
+        "english": "Weather",
+        "korean": "날씨",
+        "audioEn": "English Words/nature/000_Weather.mp3",
+        "audioKo": "Korean Words/nature/000_날씨.mp3"
+      },
+      {
+        "index": "001",
+        "english": "Rain",
+        "korean": "비",
+        "audioEn": "English Words/nature/001_Rain.mp3",
+        "audioKo": "Korean Words/nature/001_비.mp3"
+      },
+      {
+        "index": "002",
+        "english": "Snow",
+        "korean": "눈",
+        "audioEn": "English Words/nature/002_Snow.mp3",
+        "audioKo": "Korean Words/nature/002_눈.mp3"
+      },
+      {
+        "index": "003",
+        "english": "Cloud",
+        "korean": "구름",
+        "audioEn": "English Words/nature/003_Cloud.mp3",
+        "audioKo": "Korean Words/nature/003_구름.mp3"
+      },
+      {
+        "index": "004",
+        "english": "Sun",
+        "korean": "해",
+        "audioEn": "English Words/nature/004_Sun.mp3",
+        "audioKo": "Korean Words/nature/004_해.mp3"
+      },
+      {
+        "index": "005",
+        "english": "Wind",
+        "korean": "바람",
+        "audioEn": "English Words/nature/005_Wind.mp3",
+        "audioKo": "Korean Words/nature/005_바람.mp3"
+      },
+      {
+        "index": "006",
+        "english": "Storm",
+        "korean": "폭풍",
+        "audioEn": "English Words/nature/006_Storm.mp3",
+        "audioKo": "Korean Words/nature/006_폭풍.mp3"
+      },
+      {
+        "index": "007",
+        "english": "Lightning",
+        "korean": "번개",
+        "audioEn": "English Words/nature/007_Lightning.mp3",
+        "audioKo": "Korean Words/nature/007_번개.mp3"
+      },
+      {
+        "index": "008",
+        "english": "Thunder",
+        "korean": "천둥",
+        "audioEn": "English Words/nature/008_Thunder.mp3",
+        "audioKo": "Korean Words/nature/008_천둥.mp3"
+      },
+      {
+        "index": "009",
+        "english": "Mountain",
+        "korean": "산",
+        "audioEn": "English Words/nature/009_Mountain.mp3",
+        "audioKo": "Korean Words/nature/009_산.mp3"
+      },
+      {
+        "index": "010",
+        "english": "Sea",
+        "korean": "바다",
+        "audioEn": "English Words/nature/010_Sea.mp3",
+        "audioKo": "Korean Words/nature/010_바다.mp3"
+      },
+      {
+        "index": "011",
+        "english": "River",
+        "korean": "강",
+        "audioEn": "English Words/nature/011_River.mp3",
+        "audioKo": "Korean Words/nature/011_강.mp3"
+      }
+    ],
+    "numbers": [
+      {
+        "index": "000",
+        "english": "One",
+        "korean": "일",
+        "audioEn": "English Words/numbers/000_One.mp3",
+        "audioKo": "Korean Words/numbers/000_일.mp3"
+      },
+      {
+        "index": "001",
+        "english": "Two",
+        "korean": "이",
+        "audioEn": "English Words/numbers/001_Two.mp3",
+        "audioKo": "Korean Words/numbers/001_이.mp3"
+      },
+      {
+        "index": "002",
+        "english": "Three",
+        "korean": "삼",
+        "audioEn": "English Words/numbers/002_Three.mp3",
+        "audioKo": "Korean Words/numbers/002_삼.mp3"
+      },
+      {
+        "index": "003",
+        "english": "Four",
+        "korean": "사",
+        "audioEn": "English Words/numbers/003_Four.mp3",
+        "audioKo": "Korean Words/numbers/003_사.mp3"
+      },
+      {
+        "index": "004",
+        "english": "Five",
+        "korean": "오",
+        "audioEn": "English Words/numbers/004_Five.mp3",
+        "audioKo": "Korean Words/numbers/004_오.mp3"
+      },
+      {
+        "index": "005",
+        "english": "Six",
+        "korean": "육",
+        "audioEn": "English Words/numbers/005_Six.mp3",
+        "audioKo": "Korean Words/numbers/005_육.mp3"
+      },
+      {
+        "index": "006",
+        "english": "Seven",
+        "korean": "칠",
+        "audioEn": "English Words/numbers/006_Seven.mp3",
+        "audioKo": "Korean Words/numbers/006_칠.mp3"
+      },
+      {
+        "index": "007",
+        "english": "Eight",
+        "korean": "팔",
+        "audioEn": "English Words/numbers/007_Eight.mp3",
+        "audioKo": "Korean Words/numbers/007_팔.mp3"
+      },
+      {
+        "index": "008",
+        "english": "Nine",
+        "korean": "구",
+        "audioEn": "English Words/numbers/008_Nine.mp3",
+        "audioKo": "Korean Words/numbers/008_구.mp3"
+      },
+      {
+        "index": "009",
+        "english": "Ten",
+        "korean": "십",
+        "audioEn": "English Words/numbers/009_Ten.mp3",
+        "audioKo": "Korean Words/numbers/009_십.mp3"
+      },
+      {
+        "index": "010",
+        "english": "Eleven",
+        "korean": "십일",
+        "audioEn": "English Words/numbers/010_Eleven.mp3",
+        "audioKo": "Korean Words/numbers/010_십일.mp3"
+      },
+      {
+        "index": "011",
+        "english": "Twelve",
+        "korean": "십이",
+        "audioEn": "English Words/numbers/011_Twelve.mp3",
+        "audioKo": "Korean Words/numbers/011_십이.mp3"
+      },
+      {
+        "index": "012",
+        "english": "Thirteen",
+        "korean": "십삼",
+        "audioEn": "English Words/numbers/012_Thirteen.mp3",
+        "audioKo": "Korean Words/numbers/012_십삼.mp3"
+      },
+      {
+        "index": "013",
+        "english": "Fourteen",
+        "korean": "십사",
+        "audioEn": "English Words/numbers/013_Fourteen.mp3",
+        "audioKo": "Korean Words/numbers/013_십사.mp3"
+      },
+      {
+        "index": "014",
+        "english": "Fifteen",
+        "korean": "십오",
+        "audioEn": "English Words/numbers/014_Fifteen.mp3",
+        "audioKo": "Korean Words/numbers/014_십오.mp3"
+      },
+      {
+        "index": "015",
+        "english": "Sixteen",
+        "korean": "십육",
+        "audioEn": "English Words/numbers/015_Sixteen.mp3",
+        "audioKo": "Korean Words/numbers/015_십육.mp3"
+      },
+      {
+        "index": "016",
+        "english": "Seventeen",
+        "korean": "십칠",
+        "audioEn": "English Words/numbers/016_Seventeen.mp3",
+        "audioKo": "Korean Words/numbers/016_십칠.mp3"
+      },
+      {
+        "index": "017",
+        "english": "Eighteen",
+        "korean": "십팔",
+        "audioEn": "English Words/numbers/017_Eighteen.mp3",
+        "audioKo": "Korean Words/numbers/017_십팔.mp3"
+      },
+      {
+        "index": "018",
+        "english": "Nineteen",
+        "korean": "십구",
+        "audioEn": "English Words/numbers/018_Nineteen.mp3",
+        "audioKo": "Korean Words/numbers/018_십구.mp3"
+      },
+      {
+        "index": "019",
+        "english": "Twenty",
+        "korean": "이십",
+        "audioEn": "English Words/numbers/019_Twenty.mp3",
+        "audioKo": "Korean Words/numbers/019_이십.mp3"
+      }
+    ],
+    "travel": [
+      {
+        "index": "000",
+        "english": "Airport",
+        "korean": "공항",
+        "audioEn": "English Words/travel/000_Airport.mp3",
+        "audioKo": "Korean Words/travel/000_공항.mp3"
+      },
+      {
+        "index": "001",
+        "english": "Train station",
+        "korean": "기차역",
+        "audioEn": "English Words/travel/001_Train station.mp3",
+        "audioKo": "Korean Words/travel/001_기차역.mp3"
+      },
+      {
+        "index": "002",
+        "english": "Bus",
+        "korean": "버스",
+        "audioEn": "English Words/travel/002_Bus.mp3",
+        "audioKo": "Korean Words/travel/002_버스.mp3"
+      },
+      {
+        "index": "003",
+        "english": "Taxi",
+        "korean": "택시",
+        "audioEn": "English Words/travel/003_Taxi.mp3",
+        "audioKo": "Korean Words/travel/003_택시.mp3"
+      },
+      {
+        "index": "004",
+        "english": "Hotel",
+        "korean": "호텔",
+        "audioEn": "English Words/travel/004_Hotel.mp3",
+        "audioKo": "Korean Words/travel/004_호텔.mp3"
+      },
+      {
+        "index": "005",
+        "english": "Bathroom",
+        "korean": "화장실",
+        "audioEn": "English Words/travel/005_Bathroom.mp3",
+        "audioKo": "Korean Words/travel/005_화장실.mp3"
+      },
+      {
+        "index": "006",
+        "english": "Entrance",
+        "korean": "입구",
+        "audioEn": "English Words/travel/006_Entrance.mp3",
+        "audioKo": "Korean Words/travel/006_입구.mp3"
+      },
+      {
+        "index": "007",
+        "english": "Exit",
+        "korean": "출구",
+        "audioEn": "English Words/travel/007_Exit.mp3",
+        "audioKo": "Korean Words/travel/007_출구.mp3"
+      },
+      {
+        "index": "008",
+        "english": "RoadStreet",
+        "korean": "길",
+        "audioEn": "English Words/travel/008_RoadStreet.mp3",
+        "audioKo": "Korean Words/travel/008_길.mp3"
+      },
+      {
+        "index": "009",
+        "english": "Map",
+        "korean": "지도",
+        "audioEn": "English Words/travel/009_Map.mp3",
+        "audioKo": "Korean Words/travel/009_지도.mp3"
+      },
+      {
+        "index": "010",
+        "english": "Left",
+        "korean": "왼쪽",
+        "audioEn": "English Words/travel/010_Left.mp3",
+        "audioKo": "Korean Words/travel/010_왼쪽.mp3"
+      },
+      {
+        "index": "011",
+        "english": "Right",
+        "korean": "오른쪽",
+        "audioEn": "English Words/travel/011_Right.mp3",
+        "audioKo": "Korean Words/travel/011_오른쪽.mp3"
+      }
+    ],
+    "verbs": [
+      {
+        "index": "000",
+        "english": "To go",
+        "korean": "가다",
+        "audioEn": "English Words/verbs/000_To go.mp3",
+        "audioKo": "Korean Words/verbs/000_가다.mp3"
+      },
+      {
+        "index": "001",
+        "english": "To come",
+        "korean": "오다",
+        "audioEn": "English Words/verbs/001_To come.mp3",
+        "audioKo": "Korean Words/verbs/001_오다.mp3"
+      },
+      {
+        "index": "002",
+        "english": "To eat",
+        "korean": "먹다",
+        "audioEn": "English Words/verbs/002_To eat.mp3",
+        "audioKo": "Korean Words/verbs/002_먹다.mp3"
+      },
+      {
+        "index": "003",
+        "english": "To drink",
+        "korean": "마시다",
+        "audioEn": "English Words/verbs/003_To drink.mp3",
+        "audioKo": "Korean Words/verbs/003_마시다.mp3"
+      },
+      {
+        "index": "004",
+        "english": "To seewatch",
+        "korean": "보다",
+        "audioEn": "English Words/verbs/004_To seewatch.mp3",
+        "audioKo": "Korean Words/verbs/004_보다.mp3"
+      },
+      {
+        "index": "005",
+        "english": "To listen",
+        "korean": "듣다",
+        "audioEn": "English Words/verbs/005_To listen.mp3",
+        "audioKo": "Korean Words/verbs/005_듣다.mp3"
+      },
+      {
+        "index": "006",
+        "english": "To speak",
+        "korean": "말하다",
+        "audioEn": "English Words/verbs/006_To speak.mp3",
+        "audioKo": "Korean Words/verbs/006_말하다.mp3"
+      },
+      {
+        "index": "007",
+        "english": "To read",
+        "korean": "읽다",
+        "audioEn": "English Words/verbs/007_To read.mp3",
+        "audioKo": "Korean Words/verbs/007_읽다.mp3"
+      },
+      {
+        "index": "008",
+        "english": "To write",
+        "korean": "쓰다",
+        "audioEn": "English Words/verbs/008_To write.mp3",
+        "audioKo": "Korean Words/verbs/008_쓰다.mp3"
+      },
+      {
+        "index": "009",
+        "english": "To buy",
+        "korean": "사다",
+        "audioEn": "English Words/verbs/009_To buy.mp3",
+        "audioKo": "Korean Words/verbs/009_사다.mp3"
+      },
+      {
+        "index": "010",
+        "english": "To sleep",
+        "korean": "자다",
+        "audioEn": "English Words/verbs/010_To sleep.mp3",
+        "audioKo": "Korean Words/verbs/010_자다.mp3"
+      },
+      {
+        "index": "011",
+        "english": "To work",
+        "korean": "일하다",
+        "audioEn": "English Words/verbs/011_To work.mp3",
+        "audioKo": "Korean Words/verbs/011_일하다.mp3"
+      }
+    ]
+  }
+}
