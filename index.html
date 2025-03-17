@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kengrean - Korean English Quiz Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Animated background elements -->
+    <div class="bubble-container">
+        <div class="bubble bubble-1"></div>
+        <div class="bubble bubble-2"></div>
+        <div class="bubble bubble-3"></div>
+        <div class="bubble bubble-4"></div>
+        <div class="bubble bubble-5"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1 class="game-title">Kengrean</h1>
+            <div class="subtitle">Korean-English Learning Game</div>
+        </header>
+
+        <div id="setup-screen">
+            <div class="game-options">
+                <div class="option-group">
+                    <div class="option-title">Language Mode</div>
+                    <div class="btn-group">
+                        <button id="mode-korean" class="mode-btn active">Korean → English</button>
+                        <button id="mode-english" class="mode-btn">English → Korean</button>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <div class="option-title">Game Mode</div>
+                    <div class="btn-group">
+                        <button id="game-endless" class="game-btn active">Endless</button>
+                        <button id="game-timed" class="game-btn">Time Trial</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="categories-section">
+                <h2>Select Categories</h2>
+                <div class="category-controls">
+                    <button id="select-all" class="control-btn">Select All</button>
+                    <button id="deselect-all" class="control-btn">Deselect All</button>
+                </div>
+                <div class="categories-grid" id="categories-container">
+                    <!-- Categories will be populated here dynamically -->
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="start-game" class="start-btn">Start Quiz!</button>
+            </div>
+        </div>
+
+        <div id="game-screen" class="game-area">
+            <div class="game-header">
+                <div class="score-display">Score: <span id="score">0</span></div>
+                <div class="time-display" id="time-display">Time: <span id="time">60</span>s</div>
+                <button class="main-menu-btn">Main Menu</button>
+            </div>
+
+            <div class="question-area">
+                <div class="word-display" id="current-word">안녕하세요</div>
+                <button class="play-sound" id="play-sound">
+                    <span class="sound-icon">🔊</span> Play Sound
+                </button>
+            </div>
+
+            <div class="answers-grid" id="answers-container">
+                <!-- Answer options will be populated here -->
+            </div>
+        </div>
+
+        <div id="results-screen" class="results-area">
+            <h2 class="results-header">Quiz Results</h2>
+
+            <div class="results-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="final-score">0</div>
+                    <div class="stat-label">Final Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="correct-answers">0</div>
+                    <div class="stat-label">Correct Answers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="total-questions">0</div>
+                    <div class="stat-label">Total Questions</div>
+                </div>
+            </div>
+
+            <div class="results-buttons">
+                <button id="play-again" class="play-again-btn">Play Again</button>
+                <button class="main-menu-btn menu-btn">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
