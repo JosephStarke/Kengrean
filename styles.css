@@ -586,7 +586,7 @@
             box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15), 0 0 10px rgba(255, 230, 109, 0.4);
         }
 
-        /* Updated positioning with more space from answers - consistent across devices */
+        /* Updated positioning to be centered at bottom with good spacing from answers */
         .main-menu-btn {
             background-color: #505050;
             color: #E0E0E0;
@@ -596,14 +596,14 @@
             transition: all 0.3s ease;
             margin-top: 30px;
             position: absolute;
-            bottom: 40px;
-            /* Increased for more space - consistent value for all devices */
+            bottom: 35px;
+            /* Just making this a bit lower for desktop */
             left: 50%;
             transform: translateX(-50%);
         }
 
         .main-menu-btn:hover {
-            bottom: 45px;
+            bottom: 40px;
             /* Keep the same offset from original position */
             box-shadow: 0 10px 0 rgba(0, 0, 0, 0.2);
             filter: brightness(1.1);
@@ -794,8 +794,8 @@
             animation: zoom-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             position: relative;
             /* For absolute positioning of main-menu-btn */
-            padding-bottom: 110px;
-            /* Significantly increased for more space at bottom - consistent across devices */
+            padding-bottom: 90px;
+            /* Reverting to previous value */
             max-height: 90vh;
             /* Limit height to ensure it fits on screen */
         }
@@ -1146,19 +1146,20 @@
                 padding: 20px 15px 80px;
             }
 
-            /* Center aligned main menu button at bottom with consistent spacing */
+            /* Center aligned main menu button at bottom with more space */
             .main-menu-btn {
                 padding: 8px 15px;
                 font-size: 0.9rem;
                 position: absolute;
-                bottom: 40px;
-                /* Consistent with desktop for better UX */
+                bottom: 20px;
+                /* Reverted to previous value */
                 left: 50%;
                 transform: translateX(-50%);
             }
 
             .main-menu-btn:hover {
-                bottom: 45px;
+                bottom: 25px;
+                /* Reverted to previous value */
                 transform: translateX(-50%);
                 /* Maintain center alignment */
             }
@@ -1172,17 +1173,8 @@
                 margin-bottom: 10px;
             }
 
-            /* Changed to 2 column layout for mobile - same as tablet */
             .categories-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-                /* Smaller gap for mobile */
-            }
-
-            /* Make category bubbles smaller on mobile */
-            .category-bubble {
-                padding: 12px;
-                font-size: 1rem;
+                grid-template-columns: 1fr;
             }
 
             .game-header {
