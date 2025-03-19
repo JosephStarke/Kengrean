@@ -1,0 +1,10 @@
+행복, Happiness
+슬픔, Sadness
+사랑, Love
+웃음, Smile
+눈물, Tear
+화남, Anger
+걱정, Worry
+아픔, Pain
+피곤함, Tiredness
+배고픔, Hunger

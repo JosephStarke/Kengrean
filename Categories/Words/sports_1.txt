@@ -1,0 +1,10 @@
+축구, Soccer
+야구, Baseball
+농구, Basketball
+수영, Swimming
+달리기, Running
+테니스, Tennis
+골프, Golf
+배구, Volleyball
+탁구, Table tennis
+권투, Boxing

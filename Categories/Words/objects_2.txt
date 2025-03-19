@@ -1,0 +1,10 @@
+텔레비전, Television
+컴퓨터, Computer
+휴대폰, Cellphone
+전화기, Telephone
+냉장고, Refrigerator
+화장실, Bathroom
+부엌, Kitchen
+거울, Mirror
+사진, Photo
+열쇠, Key

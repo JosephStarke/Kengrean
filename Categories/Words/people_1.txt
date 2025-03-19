@@ -1,0 +1,14 @@
+소년, Young boy
+소녀, Young girl
+어른, Adult
+노인, Elderly person
+남자아이, Boy
+여자아이, Girl
+아기, Baby
+사람, Person
+남자, Man
+여자, Woman
+아이, Child
+친구, Friend
+학생, Student
+선생님, Teacher

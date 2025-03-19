@@ -1,0 +1,10 @@
+태양, Sun
+구름, Cloud
+바람, Wind
+호수, Lake
+숲, Forest
+돌, Stone
+모래, Sand
+불, Fire
+얼음, Ice
+폭포, Waterfall

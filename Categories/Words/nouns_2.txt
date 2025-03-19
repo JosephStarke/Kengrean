@@ -1,0 +1,10 @@
+사진, Photo
+친구, Friend
+계획, Plan
+여행, Travel
+취미, Hobby
+생일, Birthday
+선물, Gift
+약속, Appointment/Promise
+주소, Address
+이메일, Email

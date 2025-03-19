@@ -1,0 +1,10 @@
+차, Car
+버스, Bus
+기차, Train
+비행기, Airplane
+자전거, Bicycle
+택시, Taxi
+길, Road
+지하철, Subway
+배, Boat
+오토바이, Motorcycle

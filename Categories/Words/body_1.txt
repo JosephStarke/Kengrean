@@ -1,0 +1,10 @@
+몸, Body
+머리, Head
+눈, Eye
+코, Nose
+입, Mouth
+손, Hand
+발, Foot
+약, Medicine
+병원, Hospital
+의사, Doctor

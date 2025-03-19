@@ -1,0 +1,10 @@
+돈, Money
+이름, Name
+나이, Age
+사랑, Love
+꿈, Dream
+문제, Problem
+음악, Music
+영화, Movie
+시간, Time
+하루, Day

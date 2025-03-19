@@ -1,0 +1,10 @@
+좋아하다, To like
+사랑하다, To love
+싫어하다, To dislike
+생각하다, To think
+알다, To know
+모르다, To not know
+운동하다, To exercise
+전화하다, To call
+청소하다, To clean
+시작하다, To start/begin

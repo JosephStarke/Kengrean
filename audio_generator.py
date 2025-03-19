@@ -8,17 +8,25 @@ from gtts import gTTS
 # Input directory for category files
 CATEGORIES_DIR = "Categories"
 
+# Output directories
+KOREAN_DIR = "Korean"
+ENGLISH_DIR = "English"
+
+# Target bin to process: "Alphabet", "Words", "Phrases", or "ALL"
+# Change this to focus on only one bin at a time
+TARGET_BIN = "ALL"  # Options: "Alphabet", "Words", "Phrases", or "ALL"
+
 # =============== CODE ===============
 
 
 def parse_line(line):
     """
-    Parse a line of text in various formats and extract Korean, romanization, and English.
+    Parse a line of text in various formats and extract Korean and English.
     Supported formats:
-    1. 안녕하세요 → annyeonghaseyo → Hello
-    2. 안녕하세요 annyeonghaseyo Hello
-    3. 안녕하세요, annyeonghaseyo, Hello
-    4. 안녕하세요,annyeonghaseyo,Hello
+    1. 안녕하세요 → Hello
+    2. 안녕하세요 Hello
+    3. 안녕하세요, Hello
+    4. 안녕하세요,Hello
     """
     line = line.strip()
     if not line:
@@ -27,21 +35,36 @@ def parse_line(line):
     # Format 1: With arrows (→)
     if "→" in line:
         parts = [part.strip() for part in line.split("→")]
-        if len(parts) >= 3:
-            return parts[0], parts[1], parts[2]
+        if len(parts) >= 2:
+            return parts[0], parts[1]
 
     # Format 3 & 4: Comma-separated (with or without spaces)
     elif "," in line:
         parts = [part.strip() for part in line.split(",")]
-        if len(parts) >= 3:
-            return parts[0], parts[1], parts[2]
+        if len(parts) >= 2:
+            return parts[0], parts[1]
 
-    # Format 2: Space-separated (this is a fallback and might cause issues with multi-word items)
+    # Format 2: Space-separated (this might cause issues with multi-word items)
     else:
-        parts = line.split()
-        if len(parts) >= 3:
-            # Assume first item is Korean, last item is English, middle is romanization
-            return parts[0], parts[1], " ".join(parts[2:])
+        # Try to determine where Korean ends and English begins
+        # Korean characters are in the range U+AC00 to U+D7A3
+        korean_chars = []
+        non_korean_start = 0
+
+        for i, char in enumerate(line):
+            if "\uac00" <= char <= "\ud7a3" or char.isspace() or char in ".,?!":
+                korean_chars.append(char)
+                non_korean_start = i + 1
+            else:
+                break
+
+        # If we found any Korean characters, split at that point
+        if korean_chars and non_korean_start < len(line):
+            korean_text = "".join(korean_chars).strip()
+            english_text = line[non_korean_start:].strip()
+
+            if korean_text and english_text:
+                return korean_text, english_text
 
     # If we can't parse the line properly
     return None
@@ -107,13 +130,27 @@ def process_file(file_path):
     Process a vocabulary file and generate MP3 files for each word in
     both Korean and English.
     """
-    # Get category name from filename (without extension)
-    category = os.path.splitext(os.path.basename(file_path))[0]
-    print(f"\nProcessing category: {category}")
+    # Get full relative path from Categories directory
+    rel_path = os.path.relpath(file_path, CATEGORIES_DIR)
 
-    # Create output directories
-    korean_dir = os.path.join("Korean Words", category)
-    english_dir = os.path.join("English Words", category)
+    # Extract bin name and category name from the path
+    path_parts = os.path.split(rel_path)
+
+    if len(path_parts) > 1:
+        # The first part is the bin name (e.g., "Alphabet")
+        bin_name = path_parts[0]
+        # The category name is the filename without extension
+        category = os.path.splitext(os.path.basename(file_path))[0]
+    else:
+        # If it's directly in the Categories folder
+        bin_name = ""
+        category = os.path.splitext(os.path.basename(file_path))[0]
+
+    print(f"\nProcessing bin: {bin_name}, category: {category}")
+
+    # Create output directories with bin structure
+    korean_dir = os.path.join(KOREAN_DIR, bin_name, category)
+    english_dir = os.path.join(ENGLISH_DIR, bin_name, category)
 
     try:
         os.makedirs(korean_dir, exist_ok=True)
@@ -122,7 +159,14 @@ def process_file(file_path):
         print(f"English output directory: {english_dir}")
     except Exception as e:
         print(f"Error creating directories: {str(e)}")
-        return [], []
+        return {
+            "bin": bin_name,
+            "category": category,
+            "successful_korean": [],
+            "successful_english": [],
+            "failed_korean": [],
+            "failed_english": [],
+        }
 
     # Get the next file number for each language
     next_korean_number = get_next_file_number(korean_dir)
@@ -153,7 +197,7 @@ def process_file(file_path):
                     failed_english.append(error_msg)
                     continue
 
-                korean_word, romanization, english_word = result
+                korean_word, english_word = result
 
                 # Clean filenames (remove characters that aren't allowed in filenames)
                 clean_korean = re.sub(r'[\\/*?:"<>|]', "", korean_word)
@@ -187,6 +231,7 @@ def process_file(file_path):
 
     # Return results for this category
     return {
+        "bin": bin_name,
         "category": category,
         "successful_korean": successful_korean,
         "successful_english": successful_english,
@@ -197,21 +242,64 @@ def process_file(file_path):
 
 def process_all_categories():
     """
-    Process all text files in the Categories directory.
+    Process all text files in the Categories directory, including subdirectories.
+    Based on the TARGET_BIN setting.
     """
     # Ensure Categories directory exists
     if not os.path.exists(CATEGORIES_DIR):
         os.makedirs(CATEGORIES_DIR)
-        print(f"Created Categories directory. Please add vocabulary files to {CATEGORIES_DIR}/")
+
+        # Create bin directories within Categories
+        for bin_name in ["Alphabet", "Words", "Phrases"]:
+            bin_dir = os.path.join(CATEGORIES_DIR, bin_name)
+            os.makedirs(bin_dir, exist_ok=True)
+
+        print(f"Created Categories directory structure. Please add vocabulary files to:")
+        print(f"  - {os.path.join(CATEGORIES_DIR, 'Alphabet')}/")
+        print(f"  - {os.path.join(CATEGORIES_DIR, 'Words')}/")
+        print(f"  - {os.path.join(CATEGORIES_DIR, 'Phrases')}/")
         return []
 
-    # Get all text files in the Categories directory
-    text_files = glob.glob(os.path.join(CATEGORIES_DIR, "*.txt"))
+    # Create main output directories if they don't exist
+    os.makedirs(KOREAN_DIR, exist_ok=True)
+    os.makedirs(ENGLISH_DIR, exist_ok=True)
+
+    # Create bin directories within output directories
+    for bin_name in ["Alphabet", "Words", "Phrases"]:
+        os.makedirs(os.path.join(KOREAN_DIR, bin_name), exist_ok=True)
+        os.makedirs(os.path.join(ENGLISH_DIR, bin_name), exist_ok=True)
+
+    # Get text files based on TARGET_BIN setting
+    text_files = []
+
+    if TARGET_BIN == "ALL":
+        # Get all text files in the Categories directory and subdirectories
+        for root, _, files in os.walk(CATEGORIES_DIR):
+            for file in files:
+                if file.endswith(".txt"):
+                    text_files.append(os.path.join(root, file))
+    else:
+        # Get only text files in the specified bin directory
+        bin_dir = os.path.join(CATEGORIES_DIR, TARGET_BIN)
+        if os.path.exists(bin_dir):
+            for file in os.listdir(bin_dir):
+                if file.endswith(".txt"):
+                    text_files.append(os.path.join(bin_dir, file))
+        else:
+            print(f"Warning: The selected bin directory '{bin_dir}' doesn't exist.")
+            print(f"Make sure to create it and add text files before running this script.")
 
     if not text_files:
-        print(f"No text files found in {CATEGORIES_DIR}/ directory.")
-        print(f"Please add vocabulary files with the format: Korean Romanization English")
+        if TARGET_BIN == "ALL":
+            print(f"No text files found in {CATEGORIES_DIR}/ directory or its subdirectories.")
+        else:
+            print(f"No text files found in {os.path.join(CATEGORIES_DIR, TARGET_BIN)}/ directory.")
+        print(f"Please add vocabulary files with the format: Korean English")
         return []
+
+    print(f"Found {len(text_files)} text files:")
+    for file in text_files:
+        print(f"  - {file}")
 
     results = []
 
@@ -228,12 +316,29 @@ def display_welcome():
     print("\n" + "=" * 70)
     print("Korean & English Text-to-Speech MP3 Generator".center(70))
     print("=" * 70)
-    print(f"Input directory: {CATEGORIES_DIR}/")
-    print("Supported formats:")
-    print("  1. 안녕하세요 → annyeonghaseyo → Hello")
-    print("  2. 안녕하세요 annyeonghaseyo Hello")
-    print("  3. 안녕하세요, annyeonghaseyo, Hello")
-    print("  4. 안녕하세요,annyeonghaseyo,Hello")
+
+    # Display the current target bin
+    if TARGET_BIN == "ALL":
+        print("Target: Processing ALL bins")
+    else:
+        print(f"Target: Processing only '{TARGET_BIN}' bin")
+    print("-" * 70)
+
+    print(f"Input directory structure:")
+    print(f"  - {os.path.join(CATEGORIES_DIR, 'Alphabet')}/[category].txt")
+    print(f"  - {os.path.join(CATEGORIES_DIR, 'Words')}/[category].txt")
+    print(f"  - {os.path.join(CATEGORIES_DIR, 'Phrases')}/[category].txt")
+    print(f"Output directory structure:")
+    print(f"  - {KOREAN_DIR}/[bin]/[category]/")
+    print(f"  - {ENGLISH_DIR}/[bin]/[category]/")
+    print("Supported formats in text files:")
+    print("  1. 안녕하세요 → Hello")
+    print("  2. 안녕하세요 Hello")
+    print("  3. 안녕하세요, Hello")
+    print("  4. 안녕하세요,Hello")
+    print("-" * 70)
+    print("To change which bin is processed, modify the TARGET_BIN variable")
+    print("at the top of this script to 'Alphabet', 'Words', 'Phrases', or 'ALL'")
     print("-" * 70)
 
 
@@ -267,8 +372,9 @@ def main():
 
         # Detailed summary per category
         for result in results:
+            bin_name = result["bin"] if result["bin"] else "Default"
             category = result["category"]
-            print(f"\nCategory: {category}")
+            print(f"\nBin: {bin_name}, Category: {category}")
             print(f"  Korean success: {len(result['successful_korean'])}")
             print(f"  English success: {len(result['successful_english'])}")
 
@@ -284,8 +390,20 @@ def main():
                         print(f"    - {item}")
 
     print("\nOutput locations:")
-    print("- Korean Words/[CATEGORY_NAME]/")
-    print("- English Words/[CATEGORY_NAME]/")
+    print(f"- {KOREAN_DIR}/[BIN_NAME]/[CATEGORY_NAME]/")
+    print(f"- {ENGLISH_DIR}/[BIN_NAME]/[CATEGORY_NAME]/")
+    print("\nNext steps:")
+    print("1. Check the output directories to make sure the files were generated correctly.")
+
+    if TARGET_BIN == "ALL":
+        print("2. Run the appropriate config generator script for each bin:")
+        print("   - config_alphabet_generator.py")
+        print("   - config_words_generator.py")
+        print("   - config_phrases_generator.py")
+    else:
+        print(f"2. Run the config generator script for the {TARGET_BIN} bin:")
+        print(f"   - config_{TARGET_BIN.lower()}_generator.py")
+
     print("\nDone! Press any key to exit...")
     input()
 

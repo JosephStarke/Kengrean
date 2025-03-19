@@ -1,0 +1,10 @@
+네, Yes
+아니요, No
+안녕하세요, Hello
+여보세요, Hello (on phone)
+감사합니다, Thanks
+죄송합니다, Sorry
+좋아요, Good (I like it)
+싫어요, Dislike (I don’t like it)
+몰라요, I don't know
+천만에요, You're welcome

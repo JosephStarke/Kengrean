@@ -1,0 +1,17 @@
+옷, Clothes
+신발, Shoes
+모자, Hat
+바지, Pants
+치마, Skirt
+양말, Socks
+안경, Glasses
+셔츠, Shirt
+코트, Coat
+장갑, Gloves
+벨트, Belt
+재킷, Jacket
+운동화, Sneakers
+잠옷, Pajamas
+반바지, Shorts
+속옷, Underwear
+수영복, Swimsuit

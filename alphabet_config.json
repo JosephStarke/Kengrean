@@ -1,0 +1,293 @@
+{
+  "bin": "Alphabet",
+  "categories": [
+    "consonants",
+    "vowels"
+  ],
+  "words": {
+    "consonants": [
+      {
+        "index": "000",
+        "english": "gk",
+        "korean": "ㄱ",
+        "audioEn": "English/Alphabet/consonants/000_gk.mp3",
+        "audioKo": "Korean/Alphabet/consonants/000_ㄱ.mp3"
+      },
+      {
+        "index": "001",
+        "english": "kk",
+        "korean": "ㄲ",
+        "audioEn": "English/Alphabet/consonants/001_kk.mp3",
+        "audioKo": "Korean/Alphabet/consonants/001_ㄲ.mp3"
+      },
+      {
+        "index": "002",
+        "english": "n",
+        "korean": "ㄴ",
+        "audioEn": "English/Alphabet/consonants/002_n.mp3",
+        "audioKo": "Korean/Alphabet/consonants/002_ㄴ.mp3"
+      },
+      {
+        "index": "003",
+        "english": "dt",
+        "korean": "ㄷ",
+        "audioEn": "English/Alphabet/consonants/003_dt.mp3",
+        "audioKo": "Korean/Alphabet/consonants/003_ㄷ.mp3"
+      },
+      {
+        "index": "004",
+        "english": "tt",
+        "korean": "ㄸ",
+        "audioEn": "English/Alphabet/consonants/004_tt.mp3",
+        "audioKo": "Korean/Alphabet/consonants/004_ㄸ.mp3"
+      },
+      {
+        "index": "005",
+        "english": "rl",
+        "korean": "ㄹ",
+        "audioEn": "English/Alphabet/consonants/005_rl.mp3",
+        "audioKo": "Korean/Alphabet/consonants/005_ㄹ.mp3"
+      },
+      {
+        "index": "006",
+        "english": "m",
+        "korean": "ㅁ",
+        "audioEn": "English/Alphabet/consonants/006_m.mp3",
+        "audioKo": "Korean/Alphabet/consonants/006_ㅁ.mp3"
+      },
+      {
+        "index": "007",
+        "english": "bp",
+        "korean": "ㅂ",
+        "audioEn": "English/Alphabet/consonants/007_bp.mp3",
+        "audioKo": "Korean/Alphabet/consonants/007_ㅂ.mp3"
+      },
+      {
+        "index": "008",
+        "english": "pp",
+        "korean": "ㅃ",
+        "audioEn": "English/Alphabet/consonants/008_pp.mp3",
+        "audioKo": "Korean/Alphabet/consonants/008_ㅃ.mp3"
+      },
+      {
+        "index": "009",
+        "english": "s",
+        "korean": "ㅅ",
+        "audioEn": "English/Alphabet/consonants/009_s.mp3",
+        "audioKo": "Korean/Alphabet/consonants/009_ㅅ.mp3"
+      },
+      {
+        "index": "010",
+        "english": "ss",
+        "korean": "ㅆ",
+        "audioEn": "English/Alphabet/consonants/010_ss.mp3",
+        "audioKo": "Korean/Alphabet/consonants/010_ㅆ.mp3"
+      },
+      {
+        "index": "011",
+        "english": "silentng",
+        "korean": "ㅇ",
+        "audioEn": "English/Alphabet/consonants/011_silentng.mp3",
+        "audioKo": "Korean/Alphabet/consonants/011_ㅇ.mp3"
+      },
+      {
+        "index": "012",
+        "english": "j",
+        "korean": "ㅈ",
+        "audioEn": "English/Alphabet/consonants/012_j.mp3",
+        "audioKo": "Korean/Alphabet/consonants/012_ㅈ.mp3"
+      },
+      {
+        "index": "013",
+        "english": "jj",
+        "korean": "ㅉ",
+        "audioEn": "English/Alphabet/consonants/013_jj.mp3",
+        "audioKo": "Korean/Alphabet/consonants/013_ㅉ.mp3"
+      },
+      {
+        "index": "014",
+        "english": "ch",
+        "korean": "ㅊ",
+        "audioEn": "English/Alphabet/consonants/014_ch.mp3",
+        "audioKo": "Korean/Alphabet/consonants/014_ㅊ.mp3"
+      },
+      {
+        "index": "015",
+        "english": "k",
+        "korean": "ㅋ",
+        "audioEn": "English/Alphabet/consonants/015_k.mp3",
+        "audioKo": "Korean/Alphabet/consonants/015_ㅋ.mp3"
+      },
+      {
+        "index": "016",
+        "english": "t",
+        "korean": "ㅌ",
+        "audioEn": "English/Alphabet/consonants/016_t.mp3",
+        "audioKo": "Korean/Alphabet/consonants/016_ㅌ.mp3"
+      },
+      {
+        "index": "017",
+        "english": "p",
+        "korean": "ㅍ",
+        "audioEn": "English/Alphabet/consonants/017_p.mp3",
+        "audioKo": "Korean/Alphabet/consonants/017_ㅍ.mp3"
+      },
+      {
+        "index": "018",
+        "english": "h",
+        "korean": "ㅎ",
+        "audioEn": "English/Alphabet/consonants/018_h.mp3",
+        "audioKo": "Korean/Alphabet/consonants/018_ㅎ.mp3"
+      }
+    ],
+    "vowels": [
+      {
+        "index": "000",
+        "english": "ah",
+        "korean": "ㅏ",
+        "audioEn": "English/Alphabet/vowels/000_ah.mp3",
+        "audioKo": "Korean/Alphabet/vowels/000_ㅏ.mp3"
+      },
+      {
+        "index": "001",
+        "english": "ae",
+        "korean": "ㅐ",
+        "audioEn": "English/Alphabet/vowels/001_ae.mp3",
+        "audioKo": "Korean/Alphabet/vowels/001_ㅐ.mp3"
+      },
+      {
+        "index": "002",
+        "english": "yah",
+        "korean": "ㅑ",
+        "audioEn": "English/Alphabet/vowels/002_yah.mp3",
+        "audioKo": "Korean/Alphabet/vowels/002_ㅑ.mp3"
+      },
+      {
+        "index": "003",
+        "english": "yae",
+        "korean": "ㅒ",
+        "audioEn": "English/Alphabet/vowels/003_yae.mp3",
+        "audioKo": "Korean/Alphabet/vowels/003_ㅒ.mp3"
+      },
+      {
+        "index": "004",
+        "english": "uh",
+        "korean": "ㅓ",
+        "audioEn": "English/Alphabet/vowels/004_uh.mp3",
+        "audioKo": "Korean/Alphabet/vowels/004_ㅓ.mp3"
+      },
+      {
+        "index": "005",
+        "english": "eh",
+        "korean": "ㅔ",
+        "audioEn": "English/Alphabet/vowels/005_eh.mp3",
+        "audioKo": "Korean/Alphabet/vowels/005_ㅔ.mp3"
+      },
+      {
+        "index": "006",
+        "english": "yuh",
+        "korean": "ㅕ",
+        "audioEn": "English/Alphabet/vowels/006_yuh.mp3",
+        "audioKo": "Korean/Alphabet/vowels/006_ㅕ.mp3"
+      },
+      {
+        "index": "007",
+        "english": "ye",
+        "korean": "ㅖ",
+        "audioEn": "English/Alphabet/vowels/007_ye.mp3",
+        "audioKo": "Korean/Alphabet/vowels/007_ㅖ.mp3"
+      },
+      {
+        "index": "008",
+        "english": "oh",
+        "korean": "ㅗ",
+        "audioEn": "English/Alphabet/vowels/008_oh.mp3",
+        "audioKo": "Korean/Alphabet/vowels/008_ㅗ.mp3"
+      },
+      {
+        "index": "009",
+        "english": "wah",
+        "korean": "ㅘ",
+        "audioEn": "English/Alphabet/vowels/009_wah.mp3",
+        "audioKo": "Korean/Alphabet/vowels/009_ㅘ.mp3"
+      },
+      {
+        "index": "010",
+        "english": "wae",
+        "korean": "ㅙ",
+        "audioEn": "English/Alphabet/vowels/010_wae.mp3",
+        "audioKo": "Korean/Alphabet/vowels/010_ㅙ.mp3"
+      },
+      {
+        "index": "011",
+        "english": "oe",
+        "korean": "ㅚ",
+        "audioEn": "English/Alphabet/vowels/011_oe.mp3",
+        "audioKo": "Korean/Alphabet/vowels/011_ㅚ.mp3"
+      },
+      {
+        "index": "012",
+        "english": "yo",
+        "korean": "ㅛ",
+        "audioEn": "English/Alphabet/vowels/012_yo.mp3",
+        "audioKo": "Korean/Alphabet/vowels/012_ㅛ.mp3"
+      },
+      {
+        "index": "013",
+        "english": "oo",
+        "korean": "ㅜ",
+        "audioEn": "English/Alphabet/vowels/013_oo.mp3",
+        "audioKo": "Korean/Alphabet/vowels/013_ㅜ.mp3"
+      },
+      {
+        "index": "014",
+        "english": "woh",
+        "korean": "ㅝ",
+        "audioEn": "English/Alphabet/vowels/014_woh.mp3",
+        "audioKo": "Korean/Alphabet/vowels/014_ㅝ.mp3"
+      },
+      {
+        "index": "015",
+        "english": "we",
+        "korean": "ㅞ",
+        "audioEn": "English/Alphabet/vowels/015_we.mp3",
+        "audioKo": "Korean/Alphabet/vowels/015_ㅞ.mp3"
+      },
+      {
+        "index": "016",
+        "english": "wee",
+        "korean": "ㅟ",
+        "audioEn": "English/Alphabet/vowels/016_wee.mp3",
+        "audioKo": "Korean/Alphabet/vowels/016_ㅟ.mp3"
+      },
+      {
+        "index": "017",
+        "english": "yoo",
+        "korean": "ㅠ",
+        "audioEn": "English/Alphabet/vowels/017_yoo.mp3",
+        "audioKo": "Korean/Alphabet/vowels/017_ㅠ.mp3"
+      },
+      {
+        "index": "018",
+        "english": "eu",
+        "korean": "ㅡ",
+        "audioEn": "English/Alphabet/vowels/018_eu.mp3",
+        "audioKo": "Korean/Alphabet/vowels/018_ㅡ.mp3"
+      },
+      {
+        "index": "019",
+        "english": "ui",
+        "korean": "ㅢ",
+        "audioEn": "English/Alphabet/vowels/019_ui.mp3",
+        "audioKo": "Korean/Alphabet/vowels/019_ㅢ.mp3"
+      },
+      {
+        "index": "020",
+        "english": "ee",
+        "korean": "ㅣ",
+        "audioEn": "English/Alphabet/vowels/020_ee.mp3",
+        "audioKo": "Korean/Alphabet/vowels/020_ㅣ.mp3"
+      }
+    ]
+  }
+}

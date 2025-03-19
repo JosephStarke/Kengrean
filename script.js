@@ -2,6 +2,7 @@
 const gameState = {
     languageMode: 'korean', // 'korean' or 'english'
     gameMode: 'endless', // 'endless' or 'timed'
+    selectedBin: null, // 'Alphabet', 'Words', or 'Phrases'
     selectedCategories: [],
     availableCategories: [],
     words: {},
@@ -14,10 +15,18 @@ const gameState = {
     questionStartTime: 0
 };
 
+// Config files for each bin
+const configFiles = {
+    'Alphabet': 'alphabet_config.json',
+    'Words': 'words_config.json',
+    'Phrases': 'phrases_config.json'
+};
+
 // DOM elements
 const setupScreen = document.getElementById('setup-screen');
 const gameScreen = document.getElementById('game-screen');
 const resultsScreen = document.getElementById('results-screen');
+const binsContainer = document.getElementById('bins-container');
 const categoriesContainer = document.getElementById('categories-container');
 const scoreDisplay = document.getElementById('score');
 const timeDisplay = document.getElementById('time-display');
@@ -39,16 +48,18 @@ const audioPlayer = new Audio();
 async function initGame() {
     try {
         showLoading('Loading game data...');
-        await loadConfigFile();
-        populateCategories();
         setupEventListeners();
 
-        // Start with all categories unselected
+        // Initially hide the categories until a bin is selected
+        document.querySelector('.categories-section').style.display = 'none';
+
+        // Set initial state
+        gameState.selectedBin = null;
         gameState.selectedCategories = [];
         hideLoading();
     } catch (error) {
         console.error('Error initializing game:', error);
-        showErrorMessage('Failed to load game data. Please make sure the word_config.json file exists.');
+        showErrorMessage('Failed to initialize game. Please try refreshing the page.');
         hideLoading();
     }
 }
@@ -114,10 +125,16 @@ function hideLoading() {
     }
 }
 
-// Load configuration from word_config.json file
-async function loadConfigFile() {
+// Load configuration from the selected bin's config file
+async function loadConfigFile(bin) {
     try {
-        const response = await fetch('word_config.json');
+        const configFile = configFiles[bin];
+        if (!configFile) {
+            throw new Error(`No configuration file defined for bin: ${bin}`);
+        }
+
+        showLoading(`Loading ${bin} data...`);
+        const response = await fetch(configFile);
 
         if (!response.ok) {
             throw new Error(`Failed to load configuration file: ${response.status} ${response.statusText}`);
@@ -126,23 +143,58 @@ async function loadConfigFile() {
         const config = await response.json();
 
         // Set game state from configuration
-        gameState.availableCategories = config.categories;
-        gameState.words = config.words;
+        gameState.availableCategories = config.categories || [];
+        gameState.words = config.words || {};
 
-        console.log('Configuration loaded successfully');
+        console.log(`Configuration loaded successfully for ${bin}`);
         console.log('Categories:', gameState.availableCategories);
-        console.log('Words:', gameState.words);
+        console.log('Words count:', Object.keys(gameState.words).length);
 
+        hideLoading();
+        return true;
     } catch (error) {
-        console.error('Error loading configuration file:', error);
+        console.error(`Error loading configuration file for ${bin}:`, error);
 
         // Show a more helpful error message
-        let errorMessage = 'Failed to load game configuration file (word_config.json).';
-        errorMessage += '\n\nPlease make sure you\'ve run the generate_config.php script first to create this file.';
-        errorMessage += '\n\nSee the instructions for more details.';
+        let errorMessage = `Failed to load ${bin} configuration file (${configFiles[bin]}).`;
+        errorMessage += `\n\nPlease make sure you've run the config_${bin.toLowerCase()}_generator.py script first to create this file.`;
 
         showErrorMessage(errorMessage);
-        throw error;
+        hideLoading();
+        return false;
+    }
+}
+
+// Select a bin
+async function selectBin(bin) {
+    if (gameState.selectedBin === bin) {
+        return; // Already selected
+    }
+
+    // Attempt to load the config file for this bin
+    const success = await loadConfigFile(bin);
+
+    if (success) {
+        // Update selected bin
+        gameState.selectedBin = bin;
+
+        // Update UI to show this bin is selected
+        document.querySelectorAll('.bin-item').forEach(item => {
+            if (item.dataset.bin === bin) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+
+        // Show categories section
+        document.querySelector('.categories-section').style.display = 'block';
+
+        // Clear and repopulate categories
+        populateCategories();
+
+        // Reset selected categories
+        gameState.selectedCategories = [];
     }
 }
 
@@ -203,6 +255,15 @@ function setupEventListeners() {
         });
     });
 
+    // Bin selection
+    document.addEventListener('click', function (event) {
+        const binItem = event.target.closest('.bin-item');
+        if (binItem) {
+            const binName = binItem.dataset.bin;
+            selectBin(binName);
+        }
+    });
+
     // Category selection
     document.addEventListener('click', function (event) {
         const categoryItem = event.target.closest('.category-item');
@@ -224,6 +285,12 @@ function setupEventListeners() {
 
     // Start Game button
     document.getElementById('start-game').addEventListener('click', () => {
+        // Ensure a bin is selected
+        if (!gameState.selectedBin) {
+            showErrorMessage('Please select a content type (Alphabet, Words, or Phrases) before starting the game.');
+            return;
+        }
+
         // Ensure at least one category is selected
         if (gameState.selectedCategories.length === 0) {
             showErrorMessage('Please select at least one category before starting the game.');

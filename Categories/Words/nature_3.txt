@@ -1,0 +1,10 @@
+날씨, Weather
+더위, Heat
+추위, Coldness
+온도, Temperature
+여름, Summer
+겨울, Winter
+봄, Spring
+가을, Autumn
+태풍, Typhoon
+습기, Humidity

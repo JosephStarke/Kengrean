@@ -1,0 +1,10 @@
+빨간색, Red
+파란색, Blue
+노란색, Yellow
+초록색, Green
+검은색, Black
+흰색, White
+주황색, Orange
+보라색, Purple
+분홍색, Pink
+갈색, Brown

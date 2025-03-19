@@ -1,0 +1,16 @@
+아들, Son
+딸, Daughter
+형제, Brother(s) / Sibling(s)
+자매, Sister(s)
+할머니, Grandmother
+할아버지, Grandfather
+손자, Grandson
+손녀, Granddaughter
+삼촌, Uncle
+이모, Aunt (Mother's side)
+고모, Aunt (Father's side)
+조카, Nephew/Niece
+어린이, Child (general term)
+가족, Family
+엄마, Mom
+아빠, Dad

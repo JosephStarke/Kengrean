@@ -1,0 +1,4 @@
+시간, Time
+오늘, Today
+내일, Tomorrow
+어제, Yesterday

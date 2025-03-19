@@ -36,9 +36,26 @@
 
                 <div class="option-group">
                     <div class="option-title">Game Mode</div>
-                    <div class="btn-group">
-                        <button id="game-endless" class="game-btn active">Endless</button>
+                    <div class="btn-group game-mode-group">
+                        <button id="game-quiz" class="game-btn active">Quiz</button>
+                        <button id="game-endless" class="game-btn">Endless</button>
                         <button id="game-timed" class="game-btn">Time Trial</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bins-section">
+                <h2>Select Content Type</h2>
+                <div class="bins-grid" id="bins-container">
+                    <!-- Bins will be populated here dynamically -->
+                    <div class="bin-item" data-bin="Alphabet">
+                        <div class="bin-bubble">Alphabet</div>
+                    </div>
+                    <div class="bin-item" data-bin="Words">
+                        <div class="bin-bubble">Words</div>
+                    </div>
+                    <div class="bin-item" data-bin="Phrases">
+                        <div class="bin-bubble">Phrases</div>
                     </div>
                 </div>
             </div>
@@ -55,13 +72,16 @@
             </div>
 
             <div class="text-center">
-                <button id="start-game" class="start-btn">Start Quiz</button>
+                <button id="start-game" class="start-btn">
+                    <span class="play-icon"></span>
+                </button>
             </div>
         </div>
 
         <div id="game-screen" class="game-area">
             <div class="game-header">
                 <div class="score-display">Score: <span id="score">0</span></div>
+                <div class="progress-display" id="progress-display">Progress: <span id="progress">0/0</span></div>
                 <div class="time-display" id="time-display">Time: <span id="time">60</span>s</div>
                 <button class="main-menu-btn">Main Menu</button>
             </div>
@@ -109,5 +129,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>

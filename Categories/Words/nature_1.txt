@@ -1,0 +1,10 @@
+하늘, Sky
+산, Mountain
+강, River
+바다, Sea
+나무, Tree
+꽃, Flower
+비, Rain
+눈, Snow
+별, Star
+달, Moon

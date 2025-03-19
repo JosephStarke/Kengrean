@@ -1,0 +1,10 @@
+가다, To go
+오다, To come
+먹다, To eat
+마시다, To drink
+보다, To see/watch
+듣다, To listen/hear
+말하다, To speak
+자다, To sleep
+읽다, To read
+쓰다, To write/use

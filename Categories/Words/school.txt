@@ -1,0 +1,10 @@
+학교, School
+숙제, Homework
+시험, Test
+수업, Class (lesson)
+회사, Company
+일, Work
+사무실, Office
+연필, Pencil
+종이, Paper
+지우개, Eraser

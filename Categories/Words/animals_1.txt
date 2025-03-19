@@ -1,0 +1,10 @@
+개, Dog
+고양이, Cat
+새, Bird
+물고기, Fish
+곰, Bear
+토끼, Rabbit
+소, Cow
+돼지, Pig
+말, Horse
+쥐, Mouse

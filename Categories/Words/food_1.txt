@@ -1,0 +1,12 @@
+밥, Rice (Meal)
+빵, Bread
+사과, Apple
+물, Water
+우유, Milk
+고기, Meat
+계란, Egg
+야채, Vegetable
+과일, Fruit
+치즈, Cheese
+소금, Salt
+설탕, Sugar

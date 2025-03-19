@@ -1,0 +1,10 @@
+공원, Park
+도시, City
+시장, Market
+가게, Store
+은행, Bank
+식당, Restaurant
+도서관, Library
+호텔, Hotel
+약국, Pharmacy
+경찰서, Police station

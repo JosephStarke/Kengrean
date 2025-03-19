@@ -1,0 +1,12 @@
+생선, Fish (for eating)
+소고기, Beef
+돼지고기, Pork
+닭고기, Chicken (meat)
+술, Alcohol
+맥주, Beer
+김치, Kimchi
+라면, Ramen (Instant noodles)
+국수, Noodles
+커피, Coffee
+차, Tea
+주스, Juice

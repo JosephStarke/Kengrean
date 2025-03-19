@@ -1,0 +1,10 @@
+사다, To buy
+팔다, To sell
+만들다, To make
+기다리다, To wait
+주다, To give
+받다, To receive
+앉다, To sit
+일어나다, To stand/wake up
+공부하다, To study
+일하다, To work

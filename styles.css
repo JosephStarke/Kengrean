@@ -249,6 +249,13 @@ header {
 .btn-group {
     display: flex;
     gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.game-mode-group {
+    display: flex;
+    gap: 10px;
 }
 
 button {
@@ -300,7 +307,7 @@ button.active {
 
 .mode-btn,
 .game-btn {
-    min-width: 150px;
+    min-width: 120px;
 }
 
 .control-btn {
@@ -308,17 +315,30 @@ button.active {
     color: white;
 }
 
-/* Start button */
+/* Start button - Triangle Play Shape */
 .start-btn {
     background-color: var(--accent);
-    color: var(--dark);
-    font-size: 1.8rem;
-    padding: 18px 50px;
+    width: 120px;
+    height: 120px;
     margin-top: 30px;
+    border-radius: 50%;
+    position: relative;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     animation: pulse-glow 2s infinite alternate;
-    border-radius: 50px;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
-    letter-spacing: 1px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.play-icon {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 30px 0 30px 50px;
+    border-color: transparent transparent transparent var(--dark);
+    margin-left: 10px;
+    /* Adjust to center the triangle visually */
 }
 
 @keyframes pulse-glow {
@@ -331,6 +351,63 @@ button.active {
         box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1),
             0 0 20px rgba(255, 230, 109, 0.8);
     }
+}
+
+/* Bins Section */
+.bins-section {
+    margin-bottom: 30px;
+    animation: fade-in 0.8s ease-out forwards;
+    opacity: 0;
+}
+
+.bins-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--dark);
+    font-size: 2rem;
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.8);
+}
+
+.bins-grid {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.bin-item {
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-align: center;
+    perspective: 1000px;
+}
+
+.bin-bubble {
+    background-color: var(--secondary);
+    padding: 18px 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 0 rgba(78, 205, 196, 0.3);
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: white;
+    min-width: 150px;
+}
+
+.bin-item:hover .bin-bubble {
+    transform: translateY(-8px) rotateX(10deg);
+    box-shadow: 0 16px 0 rgba(0, 0, 0, 0.2);
+    filter: brightness(1.1);
+}
+
+.bin-item.selected .bin-bubble {
+    background-color: white;
+    color: var(--dark);
+    box-shadow: 0 8px 0 rgba(255, 255, 255, 0.3),
+        0 0 15px rgba(255, 255, 255, 0.3);
+    animation: selected-pop 0.5s ease;
 }
 
 /* Categories Section */
@@ -457,7 +534,8 @@ button.active {
 }
 
 .score-display,
-.time-display {
+.time-display,
+.progress-display {
     font-size: 1.6rem;
     font-weight: bold;
     padding: 12px 25px;
@@ -470,7 +548,8 @@ button.active {
 }
 
 .score-display:before,
-.time-display:before {
+.time-display:before,
+.progress-display:before {
     content: '';
     position: absolute;
     top: -50%;
@@ -938,6 +1017,10 @@ button.active {
 
     .game-title {
         font-size: 3rem;
+    }
+
+    .game-mode-group {
+        flex-direction: column;
     }
 }
 
