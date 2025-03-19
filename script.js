@@ -1,7 +1,7 @@
 // Game state
 const gameState = {
     languageMode: 'korean', // 'korean' or 'english'
-    gameMode: 'endless', // 'endless' or 'timed'
+    gameMode: 'quiz', // 'quiz', 'endless' or 'timed'
     selectedBin: null, // 'Alphabet', 'Words', or 'Phrases'
     selectedCategories: [],
     availableCategories: [],
@@ -13,7 +13,11 @@ const gameState = {
     timer: null,
     timeRemaining: 60,
     questionStartTime: 0,
-    confettiInterval: null // Added for continuous confetti
+    confettiInterval: null, // Added for continuous confetti
+    // Quiz mode specific properties
+    quizWords: [], // Array to hold words for the quiz
+    incorrectWords: [], // Array to hold words answered incorrectly
+    currentWordIndex: 0 // Track current word index for progress
 };
 
 // Config files for each bin
@@ -31,6 +35,8 @@ const binsContainer = document.getElementById('bins-container');
 const categoriesContainer = document.getElementById('categories-container');
 const scoreDisplay = document.getElementById('score');
 const timeDisplay = document.getElementById('time-display');
+const progressDisplay = document.getElementById('progress-display');
+const progressValue = document.getElementById('progress');
 const timeValue = document.getElementById('time');
 const currentWordDisplay = document.getElementById('current-word');
 const playSoundBtn = document.getElementById('play-sound');
@@ -256,8 +262,19 @@ function setupEventListeners() {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            gameState.gameMode = btn.id === 'game-endless' ? 'endless' : 'timed';
+
+            // Set game mode based on button id
+            if (btn.id === 'game-quiz') {
+                gameState.gameMode = 'quiz';
+            } else if (btn.id === 'game-endless') {
+                gameState.gameMode = 'endless';
+            } else if (btn.id === 'game-timed') {
+                gameState.gameMode = 'timed';
+            }
+
+            // Show/hide displays based on mode
             timeDisplay.style.display = gameState.gameMode === 'timed' ? 'block' : 'none';
+            progressDisplay.style.display = gameState.gameMode === 'quiz' ? 'block' : 'none';
         });
     });
 
@@ -349,6 +366,42 @@ function showErrorMessage(message) {
     alert(message);
 }
 
+// Initialize quiz words
+function initQuizWords() {
+    gameState.quizWords = [];
+    gameState.incorrectWords = [];
+    gameState.currentWordIndex = 0;
+
+    // Get one word from each selected category
+    gameState.selectedCategories.forEach(category => {
+        if (gameState.words[category] && gameState.words[category].length > 0) {
+            // Get all words from this category
+            const categoryWords = [...gameState.words[category]];
+
+            // Add one random word from each category
+            if (categoryWords.length > 0) {
+                const randomIndex = Math.floor(Math.random() * categoryWords.length);
+                gameState.quizWords.push(categoryWords[randomIndex]);
+            }
+        }
+    });
+
+    // Shuffle the array for randomization
+    gameState.quizWords = shuffleArray([...gameState.quizWords]);
+
+    // Update progress display
+    updateProgressDisplay();
+}
+
+// Update the progress display
+function updateProgressDisplay() {
+    if (gameState.gameMode === 'quiz') {
+        const total = gameState.quizWords.length + gameState.incorrectWords.length;
+        const current = Math.min(gameState.currentWordIndex + 1, total);
+        progressValue.textContent = `${current}/${total}`;
+    }
+}
+
 // Start the game
 function startGame() {
     // Reset scroll position to top
@@ -363,12 +416,18 @@ function startGame() {
     // Initialize score display
     updateScoreDisplay();
 
-    // Show/hide timer based on game mode
+    // Show/hide timer and progress based on game mode
     timeDisplay.style.display = gameState.gameMode === 'timed' ? 'block' : 'none';
+    progressDisplay.style.display = gameState.gameMode === 'quiz' ? 'block' : 'none';
 
     // Start timer if in timed mode
     if (gameState.gameMode === 'timed') {
         startTimer();
+    }
+
+    // Initialize quiz words if in quiz mode
+    if (gameState.gameMode === 'quiz') {
+        initQuizWords();
     }
 
     // Load first question
@@ -382,6 +441,9 @@ function resetGame() {
     gameState.totalQuestions = 0;
     gameState.currentQuestion = null;
     gameState.timeRemaining = 60;
+    gameState.quizWords = [];
+    gameState.incorrectWords = [];
+    gameState.currentWordIndex = 0;
 
     if (gameState.timer) {
         clearInterval(gameState.timer);
@@ -422,20 +484,49 @@ function getAllSelectedWords() {
 
 // Load the next question
 function loadNextQuestion() {
-    // Get all words from selected categories
-    const allWords = getAllSelectedWords();
+    let selectedWord;
 
-    // Make sure we have words to choose from
-    if (allWords.length === 0) {
-        console.error('No words available in the selected categories');
-        showErrorMessage('No words available in the selected categories. Please select different categories or check your file structure.');
-        endGame();
-        return;
+    if (gameState.gameMode === 'quiz') {
+        // Check if we have quiz words left
+        if (gameState.quizWords.length > 0 && gameState.currentWordIndex < gameState.quizWords.length) {
+            // Get the next word from quizWords
+            selectedWord = gameState.quizWords[gameState.currentWordIndex];
+
+            // Update progress display
+            updateProgressDisplay();
+        } else if (gameState.incorrectWords.length > 0) {
+            // If we've gone through all quizWords but have incorrect words, use those
+            gameState.quizWords = shuffleArray([...gameState.incorrectWords]);
+            gameState.incorrectWords = [];
+            gameState.currentWordIndex = 0;
+            selectedWord = gameState.quizWords[0];
+
+            // Update progress display
+            updateProgressDisplay();
+        } else {
+            // If no more words (all answered correctly), end the game
+            endGame();
+            return;
+        }
+    } else {
+        // For endless and timed modes, use existing random word selection logic
+        const allWords = getAllSelectedWords();
+
+        // Make sure we have words to choose from
+        if (allWords.length === 0) {
+            console.error('No words available in the selected categories');
+            showErrorMessage('No words available in the selected categories. Please select different categories or check your file structure.');
+            endGame();
+            return;
+        }
+
+        // Randomly select a word
+        const randomIndex = Math.floor(Math.random() * allWords.length);
+        selectedWord = allWords[randomIndex];
     }
 
-    // Randomly select a word
-    const randomIndex = Math.floor(Math.random() * allWords.length);
-    const selectedWord = allWords[randomIndex];
+    // Get all words for generating incorrect options
+    const allWords = getAllSelectedWords();
 
     // Generate incorrect options
     const incorrectOptions = generateIncorrectOptions(selectedWord, allWords);
@@ -623,6 +714,11 @@ function checkAnswer(selectedOption) {
         selectedElement.classList.add('incorrect');
         correctElement.classList.add('correct');
 
+        // In quiz mode, add this word to incorrectWords for later review
+        if (gameState.gameMode === 'quiz') {
+            gameState.incorrectWords.push(word);
+        }
+
         // Penalty for wrong answer
         gameState.score = Math.max(0, gameState.score - 5);
     }
@@ -635,11 +731,18 @@ function checkAnswer(selectedOption) {
         option.style.pointerEvents = 'none';
     });
 
+    // Move to next word in quiz mode
+    if (gameState.gameMode === 'quiz') {
+        gameState.currentWordIndex++;
+    }
+
     // Load next question after a delay (reduced to 80% of original = 1200ms)
     setTimeout(() => {
-        if (gameState.gameMode === 'endless' || (gameState.gameMode === 'timed' && gameState.timeRemaining > 0)) {
+        if (gameState.gameMode === 'endless' ||
+            (gameState.gameMode === 'timed' && gameState.timeRemaining > 0) ||
+            (gameState.gameMode === 'quiz' && (gameState.currentWordIndex < gameState.quizWords.length || gameState.incorrectWords.length > 0))) {
             loadNextQuestion();
-        } else if (gameState.gameMode === 'timed' && gameState.timeRemaining <= 0) {
+        } else {
             endGame();
         }
     }, 960); // 80% of 1200ms = 960ms
