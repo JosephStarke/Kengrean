@@ -511,28 +511,47 @@ button.active {
     color: white;
 }
 
-/* Start Button - Triangle Shape */
+/* Start Button - Play button style */
 .start-btn {
     background-color: var(--accent);
     /* Yellow */
     color: var(--dark);
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
-    width: 180px;
-    height: 140px;
-    margin: 30px auto;
-    padding: 0;
+    min-width: 220px;
+    height: 80px;
+    margin: 40px auto;
+    padding: 0 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     animation: pulse-glow 2s infinite alternate;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 230, 109, 0.4);
     /* Shadow */
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    /* Triangle pointing up */
+    border-radius: 50px;
+    /* Rounded corners */
     cursor: pointer;
     border: none;
     position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.start-btn:before {
+    content: '▶';
+    font-size: 1.6rem;
+    margin-right: 15px;
+    opacity: 0.9;
+}
+
+.start-btn:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 15px 0 rgba(0, 0, 0, 0.15), 0 0 30px rgba(255, 230, 109, 0.6);
+}
+
+.start-btn:active {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15), 0 0 10px rgba(255, 230, 109, 0.4);
 }
 
 .main-menu-btn {
