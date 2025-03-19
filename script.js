@@ -44,8 +44,8 @@ const totalQuestionsDisplay = document.getElementById('total-questions');
 
 // Audio element for playing mp3s
 const audioPlayer = new Audio();
-// Set volume to 75% of original
-audioPlayer.volume = 0.75;
+// Use full volume
+audioPlayer.volume = 1.0;
 
 // Initialize the game
 async function initGame() {
@@ -564,7 +564,7 @@ function playCurrentWordSound() {
     }, 300);
 }
 
-// Play sound effects with reduced volume
+// Play sound effects with full volume
 function playSound(type) {
     const audio = new Audio();
 
@@ -574,8 +574,8 @@ function playSound(type) {
         audio.src = 'sounds/incorrect.mp3';
     }
 
-    // Set volume to 75% of original
-    audio.volume = 0.75;
+    // Use full volume
+    audio.volume = 1.0;
 
     audio.play().catch(error => {
         console.warn(`Error playing ${type} sound: ${error.message}`);
@@ -589,6 +589,9 @@ function checkAnswer(selectedOption) {
         gameState.languageMode === 'korean' && selectedOption.english === word.english ||
         gameState.languageMode === 'english' && selectedOption.korean === word.korean
     );
+
+    // Play sound BEFORE visual feedback
+    playSound(isCorrect ? 'correct' : 'incorrect');
 
     // Increment total questions
     gameState.totalQuestions++;
@@ -620,9 +623,6 @@ function checkAnswer(selectedOption) {
         // Penalty for wrong answer
         gameState.score = Math.max(0, gameState.score - 5);
     }
-
-    // Play sound at the same time as visual feedback
-    playSound(isCorrect ? 'correct' : 'incorrect');
 
     // Update score display
     updateScoreDisplay();
