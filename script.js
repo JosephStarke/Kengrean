@@ -579,6 +579,9 @@ function checkAnswer(selectedOption) {
         gameState.languageMode === 'english' && selectedOption.korean === word.korean
     );
 
+    // Play sound immediately
+    playSound(isCorrect ? 'correct' : 'incorrect');
+
     // Increment total questions
     gameState.totalQuestions++;
 
@@ -601,8 +604,7 @@ function checkAnswer(selectedOption) {
         const pointsEarned = 10 + timeBonus;
 
         gameState.score += pointsEarned;
-        createConfetti(20); // Celebrate with confetti
-        playSound('correct'); // Play correct sound
+        // No more confetti
     } else {
         // Incorrect answer
         selectedElement.classList.add('incorrect');
@@ -610,7 +612,6 @@ function checkAnswer(selectedOption) {
 
         // Penalty for wrong answer
         gameState.score = Math.max(0, gameState.score - 5);
-        playSound('incorrect'); // Play incorrect sound
     }
 
     // Update score display
@@ -660,9 +661,6 @@ function endGame() {
 
     // Show results screen
     resultsScreen.style.display = 'flex';
-
-    // Create confetti for celebration
-    createConfetti(100);
 }
 
 // Create confetti animation

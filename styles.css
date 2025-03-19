@@ -266,12 +266,12 @@ body {
 
     20%,
     60% {
-        transform: translateX(-15px) rotate(-2deg);
+        transform: translateX(-5px) rotate(-1deg);
     }
 
     40%,
     80% {
-        transform: translateX(15px) rotate(2deg);
+        transform: translateX(5px) rotate(1deg);
     }
 }
 
@@ -521,9 +521,9 @@ button.active {
 }
 
 .control-btn {
-    background-color: var(--accent3);
-    color: white;
-    box-shadow: 0 5px 0 rgba(160, 118, 249, 0.3);
+    background-color: #505050;
+    color: #E0E0E0;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* Start Button - Play button style */
@@ -888,8 +888,8 @@ button.active {
 }
 
 .answer-option:hover {
-    transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 16px 0 rgba(0, 0, 0, 0.1);
+    transform: scale(1.03);
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.1);
 }
 
 .answer-option:hover:before {
@@ -897,7 +897,7 @@ button.active {
 }
 
 .answer-option:active {
-    transform: translateY(0);
+    transform: scale(0.98);
     box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -929,6 +929,8 @@ button.active {
     border-radius: 30px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
     animation: zoom-rotate-in 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    position: relative;
+    padding-bottom: 80px;
 }
 
 .results-header {
@@ -1079,15 +1081,15 @@ button.active {
     }
 
     .game-area {
-        padding: 20px 15px 50px;
+        padding: 20px 15px 60px;
     }
 
     .main-menu-btn {
         padding: 8px 15px;
         font-size: 0.9rem;
         position: absolute;
-        bottom: -40px;
-        left: 0;
+        bottom: 15px;
+        left: 15px;
     }
 }
 
