@@ -211,7 +211,10 @@ function populateCategories() {
 
         const categoryBubble = document.createElement('div');
         categoryBubble.className = 'category-bubble';
-        categoryBubble.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+
+        // Replace underscores with spaces for display
+        const displayName = category.replace(/_/g, ' ');
+        categoryBubble.textContent = displayName.charAt(0).toUpperCase() + displayName.slice(1);
 
         categoryItem.appendChild(categoryBubble);
         categoriesContainer.appendChild(categoryItem);
@@ -563,7 +566,9 @@ function playSound(type) {
         audio.src = 'sounds/incorrect.mp3';
     }
 
-    audio.play().catch(() => { });
+    audio.play().catch(error => {
+        console.warn(`Error playing ${type} sound: ${error.message}`);
+    });
 }
 
 // Check if the selected answer is correct
