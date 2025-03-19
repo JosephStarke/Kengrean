@@ -328,9 +328,14 @@ function setupEventListeners() {
 
     // Play Again button
     document.getElementById('play-again').addEventListener('click', () => {
+        // Hide results screen
         resultsScreen.style.display = 'none';
-        setupScreen.style.display = 'block';
-        resetGame();
+
+        // Reset game state but keep settings
+        resetGameButKeepSettings();
+
+        // Start the game again with the same settings
+        startGameWithCurrentSettings();
     });
 
     // Main Menu buttons
@@ -422,6 +427,56 @@ function startGame() {
 
     // Reset game state
     resetGame();
+
+    // Initialize score display
+    updateScoreDisplay();
+
+    // Show/hide timer and progress based on game mode
+    timeDisplay.style.display = gameState.gameMode === 'timed' ? 'block' : 'none';
+    progressDisplay.style.display = gameState.gameMode === 'quiz' ? 'block' : 'none';
+
+    // Start timer if in timed mode
+    if (gameState.gameMode === 'timed') {
+        startTimer();
+    }
+
+    // Initialize quiz words if in quiz mode
+    if (gameState.gameMode === 'quiz') {
+        initQuizWords();
+    }
+
+    // Load first question
+    loadNextQuestion();
+}
+
+// Reset game state but keep settings
+function resetGameButKeepSettings() {
+    gameState.score = 0;
+    gameState.correctAnswers = 0;
+    gameState.totalQuestions = 0;
+    gameState.currentQuestion = null;
+    gameState.timeRemaining = 60;
+    gameState.quizWords = [];
+    gameState.correctlyAnsweredWords = [];
+    gameState.totalUniqueWords = 0;
+
+    if (gameState.timer) {
+        clearInterval(gameState.timer);
+        gameState.timer = null;
+    }
+
+    stopConfetti();
+
+    timeValue.textContent = gameState.timeRemaining;
+}
+
+// Start the game with current settings
+function startGameWithCurrentSettings() {
+    // Reset scroll position to top
+    window.scrollTo(0, 0);
+
+    // Show game screen
+    gameScreen.style.display = 'flex';
 
     // Initialize score display
     updateScoreDisplay();
