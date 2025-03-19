@@ -351,9 +351,6 @@ function showErrorMessage(message) {
 
 // Start the game
 function startGame() {
-    // Reset scroll position to top
-    window.scrollTo(0, 0);
-
     setupScreen.style.display = 'none';
     gameScreen.style.display = 'flex';
 
