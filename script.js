@@ -12,7 +12,8 @@ const gameState = {
     currentQuestion: null,
     timer: null,
     timeRemaining: 60,
-    questionStartTime: 0
+    questionStartTime: 0,
+    confettiInterval: null // Added for continuous confetti
 };
 
 // Config files for each bin
@@ -43,6 +44,8 @@ const totalQuestionsDisplay = document.getElementById('total-questions');
 
 // Audio element for playing mp3s
 const audioPlayer = new Audio();
+// Set volume to 75% of original
+audioPlayer.volume = 0.75;
 
 // Initialize the game
 async function initGame() {
@@ -327,6 +330,9 @@ function returnToMainMenu() {
         gameState.timer = null;
     }
 
+    // Stop confetti
+    stopConfetti();
+
     // Hide game and results screens
     gameScreen.style.display = 'none';
     resultsScreen.style.display = 'none';
@@ -378,6 +384,8 @@ function resetGame() {
         clearInterval(gameState.timer);
         gameState.timer = null;
     }
+
+    stopConfetti();
 
     timeValue.textContent = gameState.timeRemaining;
 }
@@ -556,7 +564,7 @@ function playCurrentWordSound() {
     }, 300);
 }
 
-// Play sound effects
+// Play sound effects with reduced volume
 function playSound(type) {
     const audio = new Audio();
 
@@ -565,6 +573,9 @@ function playSound(type) {
     } else if (type === 'incorrect') {
         audio.src = 'sounds/incorrect.mp3';
     }
+
+    // Set volume to 75% of original
+    audio.volume = 0.75;
 
     audio.play().catch(error => {
         console.warn(`Error playing ${type} sound: ${error.message}`);
@@ -578,9 +589,6 @@ function checkAnswer(selectedOption) {
         gameState.languageMode === 'korean' && selectedOption.english === word.english ||
         gameState.languageMode === 'english' && selectedOption.korean === word.korean
     );
-
-    // Play sound immediately
-    playSound(isCorrect ? 'correct' : 'incorrect');
 
     // Increment total questions
     gameState.totalQuestions++;
@@ -604,7 +612,6 @@ function checkAnswer(selectedOption) {
         const pointsEarned = 10 + timeBonus;
 
         gameState.score += pointsEarned;
-        // No more confetti
     } else {
         // Incorrect answer
         selectedElement.classList.add('incorrect');
@@ -614,6 +621,9 @@ function checkAnswer(selectedOption) {
         gameState.score = Math.max(0, gameState.score - 5);
     }
 
+    // Play sound at the same time as visual feedback
+    playSound(isCorrect ? 'correct' : 'incorrect');
+
     // Update score display
     updateScoreDisplay();
 
@@ -622,19 +632,44 @@ function checkAnswer(selectedOption) {
         option.style.pointerEvents = 'none';
     });
 
-    // Load next question after a delay (80% of original 1500ms = 1200ms)
+    // Load next question after a delay (reduced to 80% of original = 1200ms)
     setTimeout(() => {
         if (gameState.gameMode === 'endless' || (gameState.gameMode === 'timed' && gameState.timeRemaining > 0)) {
             loadNextQuestion();
         } else if (gameState.gameMode === 'timed' && gameState.timeRemaining <= 0) {
             endGame();
         }
-    }, 1200);
+    }, 960); // 80% of 1200ms = 960ms
 }
 
 // Update the score display
 function updateScoreDisplay() {
     scoreDisplay.textContent = gameState.score;
+}
+
+// Start continuous confetti generation
+function startConfetti() {
+    // Clear any existing interval
+    stopConfetti();
+
+    // Create initial batch of confetti
+    createConfetti(50);
+
+    // Set interval to continuously create more confetti
+    gameState.confettiInterval = setInterval(() => {
+        createConfetti(10);
+    }, 1500);
+}
+
+// Stop confetti generation
+function stopConfetti() {
+    if (gameState.confettiInterval) {
+        clearInterval(gameState.confettiInterval);
+        gameState.confettiInterval = null;
+    }
+
+    // Remove any existing confetti
+    document.querySelectorAll('.confetti').forEach(c => c.remove());
 }
 
 // End the game and show results
@@ -661,6 +696,9 @@ function endGame() {
 
     // Show results screen
     resultsScreen.style.display = 'flex';
+
+    // Start continuous confetti
+    startConfetti();
 }
 
 // Create confetti animation
@@ -682,11 +720,13 @@ function createConfetti(count) {
         // Add some rotation and movement variation
         confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
 
-        document.body.appendChild(confetti);
+        resultsScreen.appendChild(confetti);
 
-        // Remove after animation completes
+        // Remove after animation completes to avoid memory issues
         setTimeout(() => {
-            confetti.remove();
+            if (confetti.parentNode) {
+                confetti.remove();
+            }
         }, 5000);
     }
 }

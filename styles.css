@@ -257,6 +257,7 @@ body {
     }
 }
 
+/* Modified to be less intense */
 @keyframes incorrect-answer {
 
     0%,
@@ -266,12 +267,12 @@ body {
 
     20%,
     60% {
-        transform: translateX(-5px) rotate(-1deg);
+        transform: translateX(-2px) rotate(-0.5deg);
     }
 
     40%,
     80% {
-        transform: translateX(5px) rotate(1deg);
+        transform: translateX(2px) rotate(0.5deg);
     }
 }
 
@@ -334,6 +335,7 @@ body {
     }
 }
 
+/* Modified for continuous confetti */
 @keyframes confetti-fall {
     0% {
         transform: translateY(-100px) rotate(0deg);
@@ -562,6 +564,7 @@ button.active {
     box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15), 0 0 10px rgba(255, 230, 109, 0.4);
 }
 
+/* Updated positioning to be more spaced from answers */
 .main-menu-btn {
     background-color: #505050;
     color: #E0E0E0;
@@ -569,6 +572,7 @@ button.active {
     border-radius: 50px;
     box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
+    margin-top: 30px;
 }
 
 .main-menu-btn:hover {
@@ -758,6 +762,10 @@ button.active {
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     margin-bottom: 40px;
     animation: zoom-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    position: relative;
+    /* Added for absolute positioning of main-menu-btn */
+    padding-bottom: 100px;
+    /* Added more space at bottom for menu button */
 }
 
 .game-header {
@@ -931,6 +939,8 @@ button.active {
     animation: zoom-rotate-in 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     position: relative;
     padding-bottom: 80px;
+    overflow: hidden;
+    /* For confetti to be contained properly */
 }
 
 .results-header {
@@ -1045,6 +1055,17 @@ button.active {
 }
 
 @media (max-width: 768px) {
+
+    /* Mobile styles - reduced spacing between header and content */
+    header {
+        padding: 10px 0;
+        margin-bottom: 15px;
+    }
+
+    .game-title {
+        font-size: 2.8rem;
+    }
+
     .answers-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 15px;
@@ -1081,19 +1102,27 @@ button.active {
     }
 
     .game-area {
-        padding: 20px 15px 60px;
+        padding: 20px 15px 80px;
     }
 
+    /* Repositioned main menu button for better spacing */
     .main-menu-btn {
         padding: 8px 15px;
         font-size: 0.9rem;
         position: absolute;
-        bottom: 15px;
-        left: 15px;
+        bottom: 20px;
+        left: 20px;
     }
 }
 
 @media (max-width: 500px) {
+
+    /* Further reduce spacing on smaller screens */
+    header {
+        padding: 5px 0;
+        margin-bottom: 10px;
+    }
+
     .categories-grid {
         grid-template-columns: 1fr;
     }
