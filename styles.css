@@ -574,15 +574,19 @@ button.active {
     transition: all 0.3s ease;
     margin-top: 30px;
     position: absolute;
-    bottom: 25px;
+    bottom: 30px;
+    /* Increased from 25px for more space */
     left: 50%;
     transform: translateX(-50%);
 }
 
 .main-menu-btn:hover {
-    bottom: 30px;
+    bottom: 35px;
+    /* Keep the same offset from original position */
     box-shadow: 0 10px 0 rgba(0, 0, 0, 0.2);
     filter: brightness(1.1);
+    transform: translateX(-50%);
+    /* Maintain center alignment during hover */
 }
 
 .play-again-btn {
@@ -768,8 +772,8 @@ button.active {
     animation: zoom-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     position: relative;
     /* For absolute positioning of main-menu-btn */
-    padding-bottom: 80px;
-    /* Space at bottom for menu button */
+    padding-bottom: 90px;
+    /* Increased from 80px for more space at bottom */
     max-height: 90vh;
     /* Limit height to ensure it fits on screen */
 }
@@ -1120,14 +1124,21 @@ button.active {
         padding: 20px 15px 80px;
     }
 
-    /* Center aligned main menu button at bottom */
+    /* Center aligned main menu button at bottom with more space */
     .main-menu-btn {
         padding: 8px 15px;
         font-size: 0.9rem;
         position: absolute;
-        bottom: 15px;
+        bottom: 20px;
+        /* Increased from 15px */
         left: 50%;
         transform: translateX(-50%);
+    }
+
+    .main-menu-btn:hover {
+        bottom: 25px;
+        transform: translateX(-50%);
+        /* Maintain center alignment */
     }
 }
 
