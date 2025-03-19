@@ -1,3 +1,17 @@
+.bin-btn {
+    min-width: 120px;
+    margin: 0 5px;
+    background-color: var(--secondary);
+    color: white;
+    box-shadow: 0 5px 0 rgba(78, 205, 196, 0.3);
+}
+
+.bin-btn.selected {
+    background-color: var(--incorrect);
+    color: white;
+    box-shadow: 0 5px 0 rgba(255, 107, 107, 0.3);
+}
+
 /* =====================
    BASE STYLES & VARIABLES
    ===================== */
@@ -445,7 +459,7 @@ header {
 }
 
 .subtitle {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: var(--dark);
     margin-top: 5px;
     animation: pulse 2s ease-in-out infinite;
@@ -495,9 +509,9 @@ button:active {
 }
 
 button.active {
-    background-color: white;
-    color: var(--dark);
-    box-shadow: 0 5px 0 rgba(255, 255, 255, 0.3);
+    background-color: var(--incorrect);
+    color: white;
+    box-shadow: 0 5px 0 rgba(255, 107, 107, 0.3);
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -685,10 +699,10 @@ button.active {
 }
 
 .bin-item.selected .bin-bubble {
-    background-color: white;
-    color: var(--dark);
-    box-shadow: 0 8px 0 rgba(255, 255, 255, 0.3),
-        0 0 15px rgba(255, 255, 255, 0.3);
+    background-color: var(--incorrect);
+    color: white;
+    box-shadow: 0 8px 0 rgba(255, 107, 107, 0.3),
+        0 0 15px rgba(255, 107, 107, 0.3);
     animation: selected-pop 0.5s ease;
 }
 
@@ -732,10 +746,10 @@ button.active {
 }
 
 .category-item.selected .category-bubble {
-    background-color: white;
-    color: var(--dark);
-    box-shadow: 0 8px 0 rgba(255, 255, 255, 0.3),
-        0 0 15px rgba(255, 255, 255, 0.3);
+    background-color: var(--incorrect);
+    color: white;
+    box-shadow: 0 8px 0 rgba(255, 107, 107, 0.3),
+        0 0 15px rgba(255, 107, 107, 0.3);
     animation: selected-pop 0.5s ease;
 }
 

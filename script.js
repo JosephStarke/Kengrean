@@ -179,7 +179,7 @@ async function selectBin(bin) {
         gameState.selectedBin = bin;
 
         // Update UI to show this bin is selected
-        document.querySelectorAll('.bin-item').forEach(item => {
+        document.querySelectorAll('.bin-btn').forEach(item => {
             if (item.dataset.bin === bin) {
                 item.classList.add('selected');
             } else {
@@ -257,9 +257,9 @@ function setupEventListeners() {
 
     // Bin selection
     document.addEventListener('click', function (event) {
-        const binItem = event.target.closest('.bin-item');
-        if (binItem) {
-            const binName = binItem.dataset.bin;
+        const binBtn = event.target.closest('.bin-btn');
+        if (binBtn) {
+            const binName = binBtn.dataset.bin;
             selectBin(binName);
         }
     });
