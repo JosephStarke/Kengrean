@@ -16,8 +16,8 @@ const gameState = {
     confettiInterval: null, // Added for continuous confetti
     // Quiz mode specific properties
     quizWords: [], // Array to hold words for the quiz
-    incorrectWords: [], // Array to hold words answered incorrectly
-    currentWordIndex: 0 // Track current word index for progress
+    correctlyAnsweredWords: [], // Array to track words answered correctly
+    totalUniqueWords: 0, // Total unique words in the quiz
 };
 
 // Config files for each bin
@@ -369,25 +369,29 @@ function showErrorMessage(message) {
 // Initialize quiz words
 function initQuizWords() {
     gameState.quizWords = [];
-    gameState.incorrectWords = [];
-    gameState.currentWordIndex = 0;
+    gameState.correctlyAnsweredWords = [];
 
-    // Get one word from each selected category
+    // Get ALL words from all selected categories
     gameState.selectedCategories.forEach(category => {
         if (gameState.words[category] && gameState.words[category].length > 0) {
-            // Get all words from this category
-            const categoryWords = [...gameState.words[category]];
-
-            // Add one random word from each category
-            if (categoryWords.length > 0) {
-                const randomIndex = Math.floor(Math.random() * categoryWords.length);
-                gameState.quizWords.push(categoryWords[randomIndex]);
-            }
+            // Add all words from this category
+            gameState.words[category].forEach(word => {
+                // Make sure each word is unique (avoid duplicates)
+                if (!gameState.quizWords.some(w =>
+                    w.index === word.index &&
+                    w.english === word.english &&
+                    w.korean === word.korean)) {
+                    gameState.quizWords.push(word);
+                }
+            });
         }
     });
 
     // Shuffle the array for randomization
     gameState.quizWords = shuffleArray([...gameState.quizWords]);
+
+    // Store the total number of unique words
+    gameState.totalUniqueWords = gameState.quizWords.length;
 
     // Update progress display
     updateProgressDisplay();
@@ -396,10 +400,16 @@ function initQuizWords() {
 // Update the progress display
 function updateProgressDisplay() {
     if (gameState.gameMode === 'quiz') {
-        const total = gameState.quizWords.length + gameState.incorrectWords.length;
-        const current = Math.min(gameState.currentWordIndex + 1, total);
-        progressValue.textContent = `${current}/${total}`;
+        progressValue.textContent = `${gameState.correctlyAnsweredWords.length}/${gameState.totalUniqueWords}`;
     }
+}
+
+// Check if a word has been answered correctly
+function isWordCorrectlyAnswered(word) {
+    return gameState.correctlyAnsweredWords.some(w =>
+        w.index === word.index &&
+        w.english === word.english &&
+        w.korean === word.korean);
 }
 
 // Start the game
@@ -442,8 +452,8 @@ function resetGame() {
     gameState.currentQuestion = null;
     gameState.timeRemaining = 60;
     gameState.quizWords = [];
-    gameState.incorrectWords = [];
-    gameState.currentWordIndex = 0;
+    gameState.correctlyAnsweredWords = [];
+    gameState.totalUniqueWords = 0;
 
     if (gameState.timer) {
         clearInterval(gameState.timer);
@@ -487,27 +497,29 @@ function loadNextQuestion() {
     let selectedWord;
 
     if (gameState.gameMode === 'quiz') {
-        // Check if we have quiz words left
-        if (gameState.quizWords.length > 0 && gameState.currentWordIndex < gameState.quizWords.length) {
-            // Get the next word from quizWords
-            selectedWord = gameState.quizWords[gameState.currentWordIndex];
-
-            // Update progress display
-            updateProgressDisplay();
-        } else if (gameState.incorrectWords.length > 0) {
-            // If we've gone through all quizWords but have incorrect words, use those
-            gameState.quizWords = shuffleArray([...gameState.incorrectWords]);
-            gameState.incorrectWords = [];
-            gameState.currentWordIndex = 0;
-            selectedWord = gameState.quizWords[0];
-
-            // Update progress display
-            updateProgressDisplay();
-        } else {
-            // If no more words (all answered correctly), end the game
+        // Check if we've completed all words
+        if (gameState.correctlyAnsweredWords.length >= gameState.totalUniqueWords) {
+            // All words have been answered correctly, end the game
             endGame();
             return;
         }
+
+        // Filter out words that have already been answered correctly
+        const remainingWords = gameState.quizWords.filter(word =>
+            !isWordCorrectlyAnswered(word));
+
+        // If no words left in main array but we haven't finished (due to incorrect answers),
+        // reset the main quiz words array with remaining words
+        if (remainingWords.length === 0) {
+            endGame();
+            return;
+        }
+
+        // Get the next word
+        selectedWord = remainingWords[0];
+
+        // Update progress display
+        updateProgressDisplay();
     } else {
         // For endless and timed modes, use existing random word selection logic
         const allWords = getAllSelectedWords();
@@ -709,14 +721,27 @@ function checkAnswer(selectedOption) {
         const pointsEarned = 10 + timeBonus;
 
         gameState.score += pointsEarned;
+
+        // In quiz mode, mark this word as correctly answered
+        if (gameState.gameMode === 'quiz' && !isWordCorrectlyAnswered(word)) {
+            gameState.correctlyAnsweredWords.push(word);
+            updateProgressDisplay();
+        }
     } else {
         // Incorrect answer
         selectedElement.classList.add('incorrect');
         correctElement.classList.add('correct');
 
-        // In quiz mode, add this word to incorrectWords for later review
+        // In quiz mode, move this word to the end of the quiz array
         if (gameState.gameMode === 'quiz') {
-            gameState.incorrectWords.push(word);
+            // Remove the word from its current position
+            gameState.quizWords = gameState.quizWords.filter(w =>
+                w.index !== word.index ||
+                w.english !== word.english ||
+                w.korean !== word.korean);
+
+            // Add it back to the end
+            gameState.quizWords.push(word);
         }
 
         // Penalty for wrong answer
@@ -731,16 +756,11 @@ function checkAnswer(selectedOption) {
         option.style.pointerEvents = 'none';
     });
 
-    // Move to next word in quiz mode
-    if (gameState.gameMode === 'quiz') {
-        gameState.currentWordIndex++;
-    }
-
     // Load next question after a delay (reduced to 80% of original = 1200ms)
     setTimeout(() => {
         if (gameState.gameMode === 'endless' ||
             (gameState.gameMode === 'timed' && gameState.timeRemaining > 0) ||
-            (gameState.gameMode === 'quiz' && (gameState.currentWordIndex < gameState.quizWords.length || gameState.incorrectWords.length > 0))) {
+            (gameState.gameMode === 'quiz' && gameState.correctlyAnsweredWords.length < gameState.totalUniqueWords)) {
             loadNextQuestion();
         } else {
             endGame();
