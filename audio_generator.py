@@ -14,7 +14,7 @@ ENGLISH_DIR = "English"
 
 # Target bin to process: "Alphabet", "Words", "Phrases", or "ALL"
 # Change this to focus on only one bin at a time
-TARGET_BIN = "ALL"  # Options: "Alphabet", "Words", "Phrases", or "ALL"
+TARGET_BIN = "Phrases"  # Options: "Alphabet", "Words", "Phrases", or "ALL"
 
 # =============== CODE ===============
 

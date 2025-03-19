@@ -1,5 +1,80 @@
 {
   "bin": "Phrases",
-  "categories": [],
-  "words": {}
+  "categories": [
+    "conversational_1"
+  ],
+  "words": {
+    "conversational_1": [
+      {
+        "index": "000",
+        "english": "Goodbye (to someone leaving)",
+        "korean": "안녕히 가세요",
+        "audioEn": "English/Phrases/conversational_1/000_Goodbye (to someone leaving).mp3",
+        "audioKo": "Korean/Phrases/conversational_1/000_안녕히 가세요.mp3"
+      },
+      {
+        "index": "001",
+        "english": "Goodbye (to someone staying)",
+        "korean": "안녕히 계세요",
+        "audioEn": "English/Phrases/conversational_1/001_Goodbye (to someone staying).mp3",
+        "audioKo": "Korean/Phrases/conversational_1/001_안녕히 계세요.mp3"
+      },
+      {
+        "index": "002",
+        "english": "How are you",
+        "korean": "잘 지내요",
+        "audioEn": "English/Phrases/conversational_1/002_How are you.mp3",
+        "audioKo": "Korean/Phrases/conversational_1/002_잘 지내요.mp3"
+      },
+      {
+        "index": "003",
+        "english": "I miss you",
+        "korean": "보고 싶어요",
+        "audioEn": "English/Phrases/conversational_1/003_I miss you.mp3",
+        "audioKo": "Korean/Phrases/conversational_1/003_보고 싶어요.mp3"
+      },
+      {
+        "index": "004",
+        "english": "I like (youit)",
+        "korean": "좋아해요",
+        "audioEn": "English/Phrases/conversational_1/004_I like (youit).mp3",
+        "audioKo": "Korean/Phrases/conversational_1/004_좋아해요.mp3"
+      },
+      {
+        "index": "005",
+        "english": "I dislike (it)",
+        "korean": "싫어해요",
+        "audioEn": "English/Phrases/conversational_1/005_I dislike (it).mp3",
+        "audioKo": "Korean/Phrases/conversational_1/005_싫어해요.mp3"
+      },
+      {
+        "index": "006",
+        "english": "I'm hungry",
+        "korean": "배고파요",
+        "audioEn": "English/Phrases/conversational_1/006_I'm hungry.mp3",
+        "audioKo": "Korean/Phrases/conversational_1/006_배고파요.mp3"
+      },
+      {
+        "index": "007",
+        "english": "I'm full",
+        "korean": "배불러요",
+        "audioEn": "English/Phrases/conversational_1/007_I'm full.mp3",
+        "audioKo": "Korean/Phrases/conversational_1/007_배불러요.mp3"
+      },
+      {
+        "index": "008",
+        "english": "I'm tired",
+        "korean": "피곤해요",
+        "audioEn": "English/Phrases/conversational_1/008_I'm tired.mp3",
+        "audioKo": "Korean/Phrases/conversational_1/008_피곤해요.mp3"
+      },
+      {
+        "index": "009",
+        "english": "Just a moment",
+        "korean": "잠시만요",
+        "audioEn": "English/Phrases/conversational_1/009_Just a moment.mp3",
+        "audioKo": "Korean/Phrases/conversational_1/009_잠시만요.mp3"
+      }
+    ]
+  }
 }

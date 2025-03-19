@@ -553,6 +553,19 @@ function playCurrentWordSound() {
     }, 300);
 }
 
+// Play sound effects
+function playSound(type) {
+    const audio = new Audio();
+
+    if (type === 'correct') {
+        audio.src = 'sounds/correct.mp3';
+    } else if (type === 'incorrect') {
+        audio.src = 'sounds/incorrect.mp3';
+    }
+
+    audio.play().catch(() => { });
+}
+
 // Check if the selected answer is correct
 function checkAnswer(selectedOption) {
     const { word } = gameState.currentQuestion;
@@ -584,7 +597,7 @@ function checkAnswer(selectedOption) {
 
         gameState.score += pointsEarned;
         createConfetti(20); // Celebrate with confetti
-        playSound('correct');
+        playSound('correct'); // Play correct sound
     } else {
         // Incorrect answer
         selectedElement.classList.add('incorrect');
@@ -592,7 +605,7 @@ function checkAnswer(selectedOption) {
 
         // Penalty for wrong answer
         gameState.score = Math.max(0, gameState.score - 5);
-        playSound('incorrect');
+        playSound('incorrect'); // Play incorrect sound
     }
 
     // Update score display
@@ -603,27 +616,14 @@ function checkAnswer(selectedOption) {
         option.style.pointerEvents = 'none';
     });
 
-    // Load next question after a delay
+    // Load next question after a delay (80% of original 1500ms = 1200ms)
     setTimeout(() => {
         if (gameState.gameMode === 'endless' || (gameState.gameMode === 'timed' && gameState.timeRemaining > 0)) {
             loadNextQuestion();
         } else if (gameState.gameMode === 'timed' && gameState.timeRemaining <= 0) {
             endGame();
         }
-    }, 1500);
-}
-
-// Play sound effects
-function playSound(type) {
-    const audio = new Audio();
-
-    if (type === 'correct') {
-        audio.src = 'sounds/correct.mp3';
-    } else if (type === 'incorrect') {
-        audio.src = 'sounds/incorrect.mp3';
-    }
-
-    audio.play().catch(() => { });
+    }, 1200);
 }
 
 // Update the score display
