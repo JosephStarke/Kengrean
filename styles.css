@@ -1,9 +1,9 @@
 .bin-btn {
     min-width: 120px;
     margin: 0 5px;
-    background-color: var(--secondary);
-    color: white;
-    box-shadow: 0 5px 0 rgba(78, 205, 196, 0.3);
+    background-color: white;
+    color: var(--dark);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
 }
 
 .bin-btn.selected {
@@ -469,8 +469,8 @@ header {
    BUTTON STYLES
    ===================== */
 button {
-    background-color: var(--incorrect);
-    color: white;
+    background-color: white;
+    color: var(--dark);
     border: none;
     padding: 12px 24px;
     border-radius: 50px;
@@ -478,7 +478,7 @@ button {
     font-size: 1.1rem;
     font-weight: bold;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 5px 0 rgba(220, 53, 69, 0.3);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
 }
@@ -523,6 +523,7 @@ button.active {
 .control-btn {
     background-color: var(--accent3);
     color: white;
+    box-shadow: 0 5px 0 rgba(160, 118, 249, 0.3);
 }
 
 /* Start Button - Play button style */
@@ -728,15 +729,15 @@ button.active {
 }
 
 .category-bubble {
-    background-color: var(--incorrect);
+    background-color: white;
     padding: 18px;
     border-radius: 20px;
-    box-shadow: 0 8px 0 rgba(220, 53, 69, 0.3);
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     transform-style: preserve-3d;
     font-size: 1.2rem;
     font-weight: bold;
-    color: white;
+    color: var(--dark);
 }
 
 .category-item:hover .category-bubble {
