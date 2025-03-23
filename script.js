@@ -53,6 +53,45 @@ const audioPlayer = new Audio();
 // Use full volume
 audioPlayer.volume = 1.0;
 
+// Add event listener to handle audio completion
+audioPlayer.addEventListener('ended', () => {
+    // Release the audio resource after playback
+    audioPlayer.src = '';
+});
+
+// Pre-create audio elements for correct and incorrect sounds
+const correctAudio = new Audio('sounds/correct.mp3');
+const incorrectAudio = new Audio('sounds/incorrect.mp3');
+
+// Use full volume for these sounds
+correctAudio.volume = 1.0;
+incorrectAudio.volume = 1.0;
+
+// Play sound effects using pre-created audio objects
+function playSound(type) {
+    if (type === 'correct') {
+        // Reset to the beginning before playing
+        correctAudio.currentTime = 0;
+        correctAudio.play().catch(error => {
+            console.warn(`Error playing correct sound: ${error.message}`);
+        });
+    } else if (type === 'incorrect') {
+        // Reset to the beginning before playing
+        incorrectAudio.currentTime = 0;
+        incorrectAudio.play().catch(error => {
+            console.warn(`Error playing incorrect sound: ${error.message}`);
+        });
+    }
+}
+
+// Function to clean up audio resources
+function cleanupAudio() {
+    audioPlayer.pause();
+    audioPlayer.src = '';
+    correctAudio.pause();
+    incorrectAudio.pause();
+}
+
 // Initialize the game
 async function initGame() {
     try {
@@ -342,6 +381,9 @@ function setupEventListeners() {
     document.querySelectorAll('.main-menu-btn').forEach(btn => {
         btn.addEventListener('click', returnToMainMenu);
     });
+
+    // Add window unload event to clean up audio resources
+    window.addEventListener('beforeunload', cleanupAudio);
 }
 
 // Return to main menu
@@ -351,6 +393,9 @@ function returnToMainMenu() {
         clearInterval(gameState.timer);
         gameState.timer = null;
     }
+
+    // Clean up audio resources
+    cleanupAudio();
 
     // Stop confetti
     stopConfetti();
@@ -465,6 +510,9 @@ function resetGameButKeepSettings() {
         gameState.timer = null;
     }
 
+    // Clean up audio resources
+    cleanupAudio();
+
     stopConfetti();
 
     timeValue.textContent = gameState.timeRemaining;
@@ -514,6 +562,9 @@ function resetGame() {
         clearInterval(gameState.timer);
         gameState.timer = null;
     }
+
+    // Clean up audio resources
+    cleanupAudio();
 
     stopConfetti();
 
@@ -706,6 +757,9 @@ function playCurrentWordSound() {
         audioPath = word.audioEn;
     }
 
+    // Make sure to stop any currently playing audio first
+    audioPlayer.pause();
+
     // Play the audio file
     audioPlayer.src = audioPath;
 
@@ -723,24 +777,6 @@ function playCurrentWordSound() {
     setTimeout(() => {
         audioBtn.classList.remove('active');
     }, 300);
-}
-
-// Play sound effects with full volume
-function playSound(type) {
-    const audio = new Audio();
-
-    if (type === 'correct') {
-        audio.src = 'sounds/correct.mp3';
-    } else if (type === 'incorrect') {
-        audio.src = 'sounds/incorrect.mp3';
-    }
-
-    // Use full volume
-    audio.volume = 1.0;
-
-    audio.play().catch(error => {
-        console.warn(`Error playing ${type} sound: ${error.message}`);
-    });
 }
 
 // Check if the selected answer is correct
@@ -860,6 +896,9 @@ function endGame() {
         clearInterval(gameState.timer);
         gameState.timer = null;
     }
+
+    // Clean up audio resources
+    cleanupAudio();
 
     // Hide game screen
     gameScreen.style.display = 'none';
