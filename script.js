@@ -896,34 +896,49 @@ function loadNextQuestion() {
 
 // Display the current question
 function displayQuestion() {
-    const { word } = gameState.currentQuestion;
+    try {
+        // Check if currentQuestion exists
+        if (!gameState.currentQuestion) {
+            console.error('Error: currentQuestion is null or undefined');
+            showErrorMessage('Failed to load question. Please try again.');
+            return;
+        }
 
-    // Display the word
-    if (gameState.languageMode === 'korean') {
-        currentWordDisplay.textContent = word.korean;
-    } else {
-        currentWordDisplay.textContent = word.english;
+        // Display the word based on language mode - for Alphabet, just show the symbol/letter
+        if (gameState.languageMode === 'korean') {
+            // Get just the letter without name/sound for Alphabet
+            currentWordDisplay.textContent = gameState.currentQuestion.korean;
+        } else {
+            // For English, just show the single letter for Alphabet
+            currentWordDisplay.textContent = gameState.currentQuestion.english;
+        }
+
+        // Clear previous answer options
+        answersContainer.innerHTML = '';
+
+        // Add new answer options
+        const correctOption = gameState.languageMode === 'korean' 
+            ? gameState.currentQuestion.english 
+            : gameState.currentQuestion.korean;
+        
+        const incorrectOptions = generateIncorrectOptions(gameState.currentQuestion, getAllSelectedWords());
+        const options = shuffleArray([correctOption, ...incorrectOptions]);
+
+        options.forEach(option => {
+            const answerOption = document.createElement('div');
+            answerOption.className = 'answer-option';
+            answerOption.textContent = option;
+            answerOption.setAttribute('data-value', option);
+            answerOption.addEventListener('click', () => checkAnswer(option));
+            answersContainer.appendChild(answerOption);
+        });
+
+        // Play the word sound
+        playCurrentWordSound();
+    } catch (error) {
+        console.error('Error displaying question:', error);
+        showErrorMessage('Failed to display question. Please try again.');
     }
-
-    // Clear previous answer options
-    answersContainer.innerHTML = '';
-
-    // Add new answer options
-    const correctOption = gameState.languageMode === 'korean' ? word.english : word.korean;
-    const incorrectOptions = generateIncorrectOptions(word, getAllSelectedWords());
-    const options = shuffleArray([correctOption, ...incorrectOptions]);
-
-    options.forEach(option => {
-        const answerOption = document.createElement('div');
-        answerOption.className = 'answer-option';
-        answerOption.textContent = option;
-        answerOption.setAttribute('data-value', option);
-        answerOption.addEventListener('click', () => checkAnswer(option));
-        answersContainer.appendChild(answerOption);
-    });
-
-    // Play the word sound
-    playCurrentWordSound();
 }
 
 // Play the current word's sound
@@ -1161,13 +1176,16 @@ function shuffleArray(array) {
 // Generate incorrect options for the question
 function generateIncorrectOptions(correctWord, allWords) {
     // We need 3 incorrect options
-    let options = [];
+    let incorrectOptions = [];
+    
+    // Determine which property (english or korean) to use based on language mode
+    const targetProperty = gameState.languageMode === 'korean' ? 'english' : 'korean';
+    const correctOption = correctWord[targetProperty];
 
-    // Filter out the correct word and make a copy to avoid modifying the original
-    let availableWords = allWords.filter(word =>
-        word.index !== correctWord.index ||
-        word.english !== correctWord.english ||
-        word.korean !== correctWord.korean
+    // Filter out the correct word
+    let availableWords = allWords.filter(word => 
+        word.index !== correctWord.index || 
+        word[targetProperty] !== correctOption
     );
 
     // If we don't have enough words, we'll need to create fewer options
@@ -1178,33 +1196,42 @@ function generateIncorrectOptions(correctWord, allWords) {
         if (availableWords.length === 0) break;
 
         const randomIndex = Math.floor(Math.random() * availableWords.length);
-        options.push(availableWords[randomIndex]);
+        const selectedOption = availableWords[randomIndex][targetProperty];
+        
+        // Make sure we don't add duplicates
+        if (!incorrectOptions.includes(selectedOption)) {
+            incorrectOptions.push(selectedOption);
+        }
+        
         availableWords.splice(randomIndex, 1); // Remove the selected word
     }
 
     // If we still need more options, we'll have to reuse some words
     // (This is a fallback that shouldn't be needed in most cases)
-    while (options.length < 3 && allWords.length > 1) {
+    while (incorrectOptions.length < 3 && allWords.length > 1) {
         // Find a word we haven't used yet if possible
         const remainingWords = allWords.filter(word =>
             word.index !== correctWord.index &&
-            !options.some(o => o.index === word.index)
+            word[targetProperty] !== correctOption && 
+            !incorrectOptions.includes(word[targetProperty])
         );
 
         if (remainingWords.length > 0) {
             const randomIndex = Math.floor(Math.random() * remainingWords.length);
-            options.push(remainingWords[randomIndex]);
+            incorrectOptions.push(remainingWords[randomIndex][targetProperty]);
         } else {
-            // If we've used all words, just pick random ones (avoiding duplicates)
+            // If we've exhausted all options, just pick something
             const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-            if (randomWord.index !== correctWord.index &&
-                !options.some(o => o.index === randomWord.index)) {
-                options.push(randomWord);
+            const randomOption = randomWord[targetProperty];
+            
+            // Avoid adding the correct option or duplicates
+            if (randomOption !== correctOption && !incorrectOptions.includes(randomOption)) {
+                incorrectOptions.push(randomOption);
             }
         }
     }
 
-    return options;
+    return incorrectOptions;
 }
 
 // Initialize the game when the page loads
