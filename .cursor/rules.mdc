@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Korean Language Learning Game
+
+- Start all responses with '🤖: '
+
+# File Organization
+- Keep all game logic in script.js
+- Store configuration data in JSON files (alphabet_config.json, words_config.json, phrases_config.json)
+- Place audio files in the sounds/ directory
+- Use descriptive variable and function names reflecting their purpose
+
+# Code Style
+- Use camelCase for variable and function names
+- Prefix state-related variables with 'gameState.'
+- Group related functions together (e.g., UI functions, game logic, audio handling)
+- Add comments for function groups and complex logic
+- Maintain consistent indentation (4 spaces)
+
+# Game Logic
+- Keep all game state in the gameState object
+- Use pure functions where possible for game mechanics
+- Handle audio resources properly (cleanup after use)
+- Separate UI updates from game logic when feasible
+
+# Audio Guidelines
+- For alphabet content, first play the name of the letter, pause for 0.5 seconds, then play the sound of the letter
+- Maintain consistent audio behavior between Korean→English and English→Korean modes
+- Ensure proper pronunciation in both languages for all content types
+- Use the same naming convention for audio files across all content types
+- For words and phrases, speak at a pace suitable for learners
+- Include options for repeated playback of audio
+- Implement a consistent audio feedback system for correct/incorrect answers
+
+# Performance Considerations
+- Use event delegation for dynamically created elements
+- Clean up event listeners when elements are removed
+- Optimize animations for performance (use CSS transitions when possible)
+- Preload audio elements for commonly used sounds
+
+# Error Handling
+- Add proper error handling for audio playback issues
+- Validate user input and game configurations
+- Provide user feedback for errors
+- Check for null/undefined values before accessing properties
+
+# Testing
+- Test across different browsers and devices
+- Verify audio playback on different platforms
+- Test with different screen sizes and orientations
+- Validate game logic with edge cases (empty categories, etc.)
+- Verify all audio files play correctly and with proper timing
+- Test audio pronunciation accuracy with native speakers when possible

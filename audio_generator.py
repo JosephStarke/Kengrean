@@ -2,6 +2,7 @@ import os
 import time
 import glob
 import re
+import shutil
 from gtts import gTTS
 
 # =============== CONFIGURATION ===============
@@ -14,7 +15,117 @@ ENGLISH_DIR = "English"
 
 # Target bin to process: "Alphabet", "Words", "Phrases", or "ALL"
 # Change this to focus on only one bin at a time
-TARGET_BIN = "Phrases"  # Options: "Alphabet", "Words", "Phrases", or "ALL"
+TARGET_BIN = "Alphabet"  # Options: "Alphabet", "Words", "Phrases", or "ALL"
+
+# Sound examples for English consonants to generate proper sounds
+ENGLISH_CONSONANT_SOUND_EXAMPLES = {
+    'b': 'buh',
+    'c': 'kuh',
+    'd': 'duh',
+    'f': 'fuh',
+    'g': 'guh',
+    'h': 'huh',
+    'j': 'juh',
+    'k': 'kuh',
+    'l': 'luh',
+    'm': 'muh',
+    'n': 'nuh',
+    'p': 'puh',
+    'q': 'kwuh',    # 'q' sounds like "kw"
+    'r': 'ruh',
+    's': 'suh',
+    't': 'tuh',
+    'v': 'vuh',
+    'w': 'wuh',
+    'x': 'ksuh',    # pronounced as "ks"
+    'y': 'yuh',
+    'z': 'zuh'
+}
+
+# Sound examples for English vowels to generate proper sounds
+ENGLISH_VOWEL_SOUND_EXAMPLES = {
+    'a': 'ah',              # as in "father"
+    'e': 'eh',              # as in "pen"
+    'i': 'ih',              # as in "sit"
+    'o': 'aw',              # as in "hot"
+    'u': 'uh',              # as in "cup"
+
+    'a (as in cake)': 'ay',
+    'e (as in me)': 'ee',
+    'i (as in ride)': 'eye',
+    'o (as in go)': 'oh',
+    'u (as in flute)': 'oo',
+
+    'a (as in cat)': 'ae',
+    'e (as in pen)': 'eh',
+    'i (as in sit)': 'ih',
+    'o (as in hot)': 'aw',
+    'u (as in cup)': 'uh',
+
+    'ai (as in rain)': 'ay',
+    'au (as in haul)': 'aw',
+    'aw (as in saw)': 'aw',
+    'ea (as in eat)': 'ee',
+    'ei (as in eight)': 'ay',
+    'ie (as in field)': 'ee',
+    'oa (as in boat)': 'oh',
+    'oi (as in coin)': 'oy',
+    'oo (as in moon)': 'oo',
+    'ou (as in house)': 'ow',
+    'ow (as in cow)': 'ow',
+    'ue (as in blue)': 'oo',
+    'ui (as in fruit)': 'oo-ee',
+    'y (as in my)': 'eye',
+    'y (as in happy)': 'ee'
+}
+
+# Sound examples for Korean consonants with vowel to make them audible
+KOREAN_CONSONANT_SOUND_EXAMPLES = {
+    'ㄱ': '가',
+    'ㄲ': '까',
+    'ㄴ': '나',
+    'ㄷ': '다',
+    'ㄸ': '따',
+    'ㄹ': '라',
+    'ㅁ': '마',
+    'ㅂ': '바',
+    'ㅃ': '빠',
+    'ㅅ': '사',
+    'ㅆ': '싸',
+    'ㅇ': '아',  # placeholder, used only when consonant is final or vowel-initial
+    'ㅈ': '자',
+    'ㅉ': '짜',
+    'ㅊ': '차',
+    'ㅋ': '카',
+    'ㅌ': '타',
+    'ㅍ': '파',
+    'ㅎ': '하'
+}
+
+# Sound examples for Korean vowels
+KOREAN_VOWEL_SOUND_EXAMPLES = {
+    'ㅏ': '아',
+    'ㅐ': '애',
+    'ㅑ': '야',
+    'ㅒ': '얘',
+    'ㅓ': '어',
+    'ㅔ': '에',
+    'ㅕ': '여',
+    'ㅖ': '예',
+    'ㅗ': '오',
+    'ㅘ': '와',
+    'ㅙ': '왜',
+    'ㅚ': '외',
+    'ㅛ': '요',
+    'ㅜ': '우',
+    'ㅝ': '워',
+    'ㅞ': '웨',
+    'ㅟ': '위',
+    'ㅠ': '유',
+    'ㅡ': '으',
+    'ㅢ': '의',
+    'ㅣ': '이'
+}
 
 # =============== CODE ===============
 
@@ -96,7 +207,7 @@ def get_next_file_number(directory):
     return max(numbers) + 1
 
 
-def create_mp3_from_text(text, output_filename, language="ko"):
+def create_mp3_from_text(text, output_filename, language="ko", slow=False):
     """
     Creates an MP3 file from text using gTTS.
     """
@@ -109,7 +220,7 @@ def create_mp3_from_text(text, output_filename, language="ko"):
             os.remove(output_filename)
 
         # Create a gTTS object
-        tts = gTTS(text=text, lang=language, slow=(language == "ko"))
+        tts = gTTS(text=text, lang=language, slow=slow)
 
         # Save directly to a file
         tts.save(output_filename)
@@ -123,6 +234,26 @@ def create_mp3_from_text(text, output_filename, language="ko"):
     except Exception as e:
         print(f"Error generating speech for '{text}': {str(e)}")
         return False
+
+
+def clear_directory(directory_path):
+    """
+    Clear all MP3 files in the specified directory.
+    """
+    if os.path.exists(directory_path):
+        print(f"Clearing existing MP3 files in {directory_path}")
+        for filename in os.listdir(directory_path):
+            if filename.lower().endswith('.mp3'):
+                file_path = os.path.join(directory_path, filename)
+                try:
+                    os.remove(file_path)
+                    print(f"  - Removed: {filename}")
+                except Exception as e:
+                    print(f"  - Error removing {filename}: {e}")
+    else:
+        # Create the directory if it doesn't exist
+        os.makedirs(directory_path, exist_ok=True)
+        print(f"Created directory: {directory_path}")
 
 
 def process_file(file_path):
@@ -148,29 +279,40 @@ def process_file(file_path):
 
     print(f"\nProcessing bin: {bin_name}, category: {category}")
 
-    # Create output directories with bin structure
-    korean_dir = os.path.join(KOREAN_DIR, bin_name, category)
-    english_dir = os.path.join(ENGLISH_DIR, bin_name, category)
-
-    try:
-        os.makedirs(korean_dir, exist_ok=True)
-        os.makedirs(english_dir, exist_ok=True)
-        print(f"Korean output directory: {korean_dir}")
-        print(f"English output directory: {english_dir}")
-    except Exception as e:
-        print(f"Error creating directories: {str(e)}")
-        return {
-            "bin": bin_name,
-            "category": category,
-            "successful_korean": [],
-            "successful_english": [],
-            "failed_korean": [],
-            "failed_english": [],
-        }
+    # Special handling for alphabet files
+    is_alphabet = bin_name == "Alphabet"
+    is_english_file = category.startswith("english_")
+    is_korean_file = category.startswith("korean_")
+    
+    # Create output directories with bin structure, only for the appropriate language
+    if is_english_file:
+        english_dir = os.path.join(ENGLISH_DIR, bin_name, category)
+        # Clear and create English directory
+        clear_directory(english_dir)
+    elif is_korean_file:
+        korean_dir = os.path.join(KOREAN_DIR, bin_name, category)
+        # Clear and create Korean directory
+        clear_directory(korean_dir)
+    else:
+        # For non-language-specific files, create both directories
+        korean_dir = os.path.join(KOREAN_DIR, bin_name, category)
+        english_dir = os.path.join(ENGLISH_DIR, bin_name, category)
+        # Clear and create both directories
+        clear_directory(korean_dir)
+        clear_directory(english_dir)
 
     # Get the next file number for each language
-    next_korean_number = get_next_file_number(korean_dir)
-    next_english_number = get_next_file_number(english_dir)
+    next_korean_number = 0 # Always start from 0 after clearing
+    next_english_number = 0 # Always start from 0 after clearing
+
+    # Only show the directories we're actually using
+    if is_english_file:
+        print(f"English output directory: {english_dir}")
+    elif is_korean_file:
+        print(f"Korean output directory: {korean_dir}")
+    else:
+        print(f"Korean output directory: {korean_dir}")
+        print(f"English output directory: {english_dir}")
 
     print(f"Starting Korean file numbering at: {next_korean_number:03d}")
     print(f"Starting English file numbering at: {next_english_number:03d}")
@@ -197,11 +339,102 @@ def process_file(file_path):
                     failed_english.append(error_msg)
                     continue
 
-                korean_word, english_word = result
+                character, pronunciation = result
 
+                # Special handling for alphabet files
+                if is_alphabet:
+                    if is_english_file:
+                        # For English alphabet files, need separate handling for consonants and vowels
+                        base_category = category.replace("english_", "")
+                        
+                        # Clean filenames
+                        clean_character = re.sub(r'[\\/*?:"<>|]', "", character)
+                        
+                        # Generate filenames with sequential numbers
+                        english_filename = f"{next_english_number:03d}_{clean_character}.mp3"
+                        english_name_filename = f"{next_english_number:03d}_{clean_character}_name.mp3"
+                        
+                        english_path = os.path.join(english_dir, english_filename)
+                        english_name_path = os.path.join(english_dir, english_name_filename)
+                        
+                        print(f"\nProcessing English alphabet {line_number}: {character}")
+                        
+                        # Generate English MP3 for letter name
+                        print(f"Generating letter name audio for '{character}'")
+                        if create_mp3_from_text(character, english_name_path, "en"):
+                            successful_english.append(f"{next_english_number:03d}_{clean_character}_name")
+                        else:
+                            failed_english.append(f"{character} (name)")
+                        
+                        # Get the appropriate sound example based on the category and character
+                        sound_example = ""
+                        if base_category == "consonants" and character in ENGLISH_CONSONANT_SOUND_EXAMPLES:
+                            sound_example = ENGLISH_CONSONANT_SOUND_EXAMPLES[character]
+                        elif base_category == "vowels" and character in ENGLISH_VOWEL_SOUND_EXAMPLES:
+                            sound_example = ENGLISH_VOWEL_SOUND_EXAMPLES[character]
+                        else:
+                            # If no special example, use character with the pronunciation
+                            sound_example = pronunciation
+                        
+                        # Generate English MP3 for letter sound
+                        print(f"Generating letter sound audio for '{character}' ('{sound_example}')")
+                        if create_mp3_from_text(sound_example, english_path, "en", slow=True):
+                            successful_english.append(f"{next_english_number:03d}_{clean_character}")
+                            next_english_number += 1
+                        else:
+                            failed_english.append(f"{character} (sound)")
+                        
+                        # Skip Korean generation for English alphabet files
+                        continue
+                    
+                    elif is_korean_file:
+                        # For Korean alphabet files, need separate handling for consonants and vowels
+                        base_category = category.replace("korean_", "")
+                        
+                        # Clean filenames
+                        clean_character = re.sub(r'[\\/*?:"<>|]', "", character)
+                        
+                        # Generate filenames with sequential numbers
+                        korean_filename = f"{next_korean_number:03d}_{clean_character}.mp3"
+                        korean_name_filename = f"{next_korean_number:03d}_{clean_character}_name.mp3"
+                        
+                        korean_path = os.path.join(korean_dir, korean_filename)
+                        korean_name_path = os.path.join(korean_dir, korean_name_filename)
+                        
+                        print(f"\nProcessing Korean alphabet {line_number}: {character}")
+                        
+                        # Generate Korean MP3 for letter name
+                        print(f"Generating letter name audio for '{character}' (name)")
+                        if create_mp3_from_text(character, korean_name_path, "ko"):
+                            successful_korean.append(f"{next_korean_number:03d}_{clean_character}_name")
+                        else:
+                            failed_korean.append(f"{character} (name)")
+                        
+                        # Get the appropriate sound example based on the category and character
+                        sound_example = ""
+                        if base_category == "consonants" and character in KOREAN_CONSONANT_SOUND_EXAMPLES:
+                            sound_example = KOREAN_CONSONANT_SOUND_EXAMPLES[character]
+                        elif base_category == "vowels" and character in KOREAN_VOWEL_SOUND_EXAMPLES:
+                            sound_example = KOREAN_VOWEL_SOUND_EXAMPLES[character]
+                        else:
+                            # If no special example, use character
+                            sound_example = character
+                        
+                        # Generate Korean MP3 for letter sound
+                        print(f"Generating letter sound audio for '{character}' using '{sound_example}'")
+                        if create_mp3_from_text(sound_example, korean_path, "ko"):
+                            successful_korean.append(f"{next_korean_number:03d}_{clean_character}")
+                            next_korean_number += 1
+                        else:
+                            failed_korean.append(f"{character} (sound)")
+                        
+                        # Skip English generation for Korean alphabet files
+                        continue
+
+                # Normal processing for non-alphabet files or unlabeled alphabet files
                 # Clean filenames (remove characters that aren't allowed in filenames)
-                clean_korean = re.sub(r'[\\/*?:"<>|]', "", korean_word)
-                clean_english = re.sub(r'[\\/*?:"<>|]', "", english_word)
+                clean_korean = re.sub(r'[\\/*?:"<>|]', "", character)
+                clean_english = re.sub(r'[\\/*?:"<>|]', "", pronunciation)
 
                 # Generate filenames with sequential numbers
                 korean_filename = f"{next_korean_number:03d}_{clean_korean}.mp3"
@@ -210,21 +443,21 @@ def process_file(file_path):
                 korean_path = os.path.join(korean_dir, korean_filename)
                 english_path = os.path.join(english_dir, english_filename)
 
-                print(f"\nProcessing word pair {line_number}: {korean_word} / {english_word}")
+                print(f"\nProcessing word pair {line_number}: {character} / {pronunciation}")
 
                 # Generate Korean MP3
-                if create_mp3_from_text(korean_word, korean_path, "ko"):
+                if create_mp3_from_text(character, korean_path, "ko"):
                     successful_korean.append(f"{next_korean_number:03d}_{clean_korean}")
                     next_korean_number += 1
                 else:
-                    failed_korean.append(korean_word)
+                    failed_korean.append(character)
 
                 # Generate English MP3
-                if create_mp3_from_text(english_word, english_path, "en"):
+                if create_mp3_from_text(pronunciation, english_path, "en"):
                     successful_english.append(f"{next_english_number:03d}_{clean_english}")
                     next_english_number += 1
                 else:
-                    failed_english.append(english_word)
+                    failed_english.append(pronunciation)
 
     except Exception as e:
         print(f"Error processing file {file_path}: {str(e)}")

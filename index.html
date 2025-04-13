@@ -40,6 +40,7 @@
                         <button id="game-quiz" class="game-btn active">Quiz</button>
                         <button id="game-endless" class="game-btn">Endless</button>
                         <button id="game-timed" class="game-btn">Time Trial</button>
+                        <button id="game-flashcard" class="game-btn">Flash Cards</button>
                     </div>
                 </div>
 
@@ -118,6 +119,34 @@
                 <button id="play-again" class="play-again-btn">Play Again?</button>
                 <button class="main-menu-btn menu-btn">Main Menu</button>
             </div>
+        </div>
+
+        <div id="flashcard-screen" class="flashcard-area">
+            <div class="game-header">
+                <div class="flashcard-progress">Cards: <span id="card-progress">0/0</span></div>
+                <div class="flashcard-correct">Correct: <span id="correct-cards">0</span></div>
+            </div>
+
+            <div class="flashcard-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="flashcard-front" id="flashcard-front"></div>
+                    <div class="flashcard-back" id="flashcard-back"></div>
+                </div>
+            </div>
+
+            <div class="flashcard-controls">
+                <button class="play-sound" id="flashcard-play-sound">
+                    <span class="sound-icon">🔊</span> Play Sound
+                </button>
+                <button class="flip-card-btn" id="flip-card">Flip Card</button>
+            </div>
+
+            <div class="flashcard-navigation">
+                <button class="incorrect-btn" id="mark-incorrect">❌ Incorrect</button>
+                <button class="correct-btn" id="mark-correct">✓ Correct</button>
+            </div>
+
+            <button class="main-menu-btn">Main Menu</button>
         </div>
     </div>
 
