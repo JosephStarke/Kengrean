@@ -493,6 +493,9 @@ function isWordCorrectlyAnswered(word) {
 // Start the game with the selected options
 function startGame() {
     try {
+        // Scroll to top of page
+        window.scrollTo(0, 0);
+        
         // Validate setup
         if (!gameState.selectedBin) {
             showErrorMessage('Please select a content type (Alphabet, Words, or Phrases).');
@@ -1055,9 +1058,20 @@ function checkAnswer(selectedOption) {
         // Play incorrect sound
         playSound('incorrect');
         
+        // Calculate the point deduction (same as what a correct answer would give)
+        const timeElapsed = Date.now() - gameState.questionStartTime;
+        const timeBonus = Math.max(0, Math.floor(50 - (timeElapsed / 100)));
+        const pointsDeducted = 100 + timeBonus;
+        
+        // Deduct points (but don't go below zero)
+        gameState.score = Math.max(0, gameState.score - pointsDeducted);
+        
         // Show visual feedback
         const selectedElement = document.querySelector(`.answer-option[data-value="${selectedOption}"]`);
         selectedElement.classList.add('incorrect');
+        
+        // Update score display
+        updateScoreDisplay();
         
         // For quiz mode, add the current question back to the queue at a random position
         if (gameState.gameMode === 'quiz' && !isWordCorrectlyAnswered(gameState.currentQuestion)) {
@@ -1066,8 +1080,15 @@ function checkAnswer(selectedOption) {
             gameState.quizWords.splice(randomPosition, 0, gameState.currentQuestion);
         }
         
-        // Disable the incorrect option
-        selectedElement.style.pointerEvents = 'none';
+        // Disable further clicks
+        document.querySelectorAll('.answer-option').forEach(option => {
+            option.style.pointerEvents = 'none';
+        });
+        
+        // Move to next question after a delay
+        setTimeout(() => {
+            loadNextQuestion();
+        }, 1000);
     }
 }
 
@@ -1181,12 +1202,40 @@ function generateIncorrectOptions(correctWord, allWords) {
     // Determine which property (english or korean) to use based on language mode
     const targetProperty = gameState.languageMode === 'korean' ? 'english' : 'korean';
     const correctOption = correctWord[targetProperty];
-
-    // Filter out the correct word
-    let availableWords = allWords.filter(word => 
-        word.index !== correctWord.index || 
-        word[targetProperty] !== correctOption
-    );
+    
+    // For the Alphabet bin, we need to make sure Korean letters stay with Korean and English with English
+    let availableWords;
+    
+    if (gameState.selectedBin === 'Alphabet') {
+        // Filter words by category (consonants or vowels) to ensure proper grouping
+        const correctWordCategory = gameState.selectedCategories.find(category => 
+            gameState.words[category].some(word => 
+                word.index === correctWord.index && 
+                word.english === correctWord.english && 
+                word.korean === correctWord.korean
+            )
+        );
+        
+        // Get words from the same category only
+        if (correctWordCategory) {
+            availableWords = gameState.words[correctWordCategory].filter(word => 
+                word.index !== correctWord.index || 
+                word[targetProperty] !== correctOption
+            );
+        } else {
+            // Fallback if category can't be determined
+            availableWords = allWords.filter(word => 
+                word.index !== correctWord.index || 
+                word[targetProperty] !== correctOption
+            );
+        }
+    } else {
+        // For non-alphabet bins, use standard filtering
+        availableWords = allWords.filter(word => 
+            word.index !== correctWord.index || 
+            word[targetProperty] !== correctOption
+        );
+    }
 
     // If we don't have enough words, we'll need to create fewer options
     const numOptionsNeeded = Math.min(3, availableWords.length);
@@ -1209,19 +1258,51 @@ function generateIncorrectOptions(correctWord, allWords) {
     // If we still need more options, we'll have to reuse some words
     // (This is a fallback that shouldn't be needed in most cases)
     while (incorrectOptions.length < 3 && allWords.length > 1) {
-        // Find a word we haven't used yet if possible
-        const remainingWords = allWords.filter(word =>
-            word.index !== correctWord.index &&
-            word[targetProperty] !== correctOption && 
-            !incorrectOptions.includes(word[targetProperty])
-        );
+        // Find words we haven't used yet if possible
+        let remainingWords;
+        
+        if (gameState.selectedBin === 'Alphabet') {
+            const correctWordCategory = gameState.selectedCategories.find(category => 
+                gameState.words[category].some(word => 
+                    word.index === correctWord.index && 
+                    word.english === correctWord.english && 
+                    word.korean === correctWord.korean
+                )
+            );
+            
+            // Try to get words from the same category
+            if (correctWordCategory) {
+                remainingWords = gameState.words[correctWordCategory].filter(word =>
+                    word.index !== correctWord.index &&
+                    word[targetProperty] !== correctOption && 
+                    !incorrectOptions.includes(word[targetProperty])
+                );
+            } else {
+                remainingWords = allWords.filter(word =>
+                    word.index !== correctWord.index &&
+                    word[targetProperty] !== correctOption && 
+                    !incorrectOptions.includes(word[targetProperty])
+                );
+            }
+        } else {
+            remainingWords = allWords.filter(word =>
+                word.index !== correctWord.index &&
+                word[targetProperty] !== correctOption && 
+                !incorrectOptions.includes(word[targetProperty])
+            );
+        }
 
         if (remainingWords.length > 0) {
             const randomIndex = Math.floor(Math.random() * remainingWords.length);
             incorrectOptions.push(remainingWords[randomIndex][targetProperty]);
         } else {
             // If we've exhausted all options, just pick something
-            const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+            let randomWordsPool = gameState.selectedBin === 'Alphabet' ? gameState.words[gameState.selectedCategories[0]] : allWords;
+            if (!randomWordsPool || randomWordsPool.length === 0) {
+                randomWordsPool = allWords;
+            }
+            
+            const randomWord = randomWordsPool[Math.floor(Math.random() * randomWordsPool.length)];
             const randomOption = randomWord[targetProperty];
             
             // Avoid adding the correct option or duplicates
