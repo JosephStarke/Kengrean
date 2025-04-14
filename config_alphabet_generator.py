@@ -58,152 +58,95 @@ def main():
     except FileNotFoundError:
         print(f"Warning: Directories not found. Please run audio_generator.py first to process your text files.")
         return
-
-    # Process each base category (consonants, vowels)
-    for base_category in unique_categories:
-        # Initialize this category in the config
-        if base_category not in config["words"]:
-            config["words"][base_category] = []
+    
+    # Now iterate through the categories directory to read actual symbol mappings
+    for category in unique_categories:
+        config["words"][category] = []
         
-        # Look for English category files
-        english_category_dir = None
-        english_category_name = f"english_{base_category}"
-        if english_category_name in english_categories:
-            english_category_dir = os.path.join(english_bin_dir, english_category_name)
-            print(f"Found English category dir: {english_category_dir}")
-        
-        # Look for Korean category files
-        korean_category_dir = None
-        korean_category_name = f"korean_{base_category}"
-        if korean_category_name in korean_categories:
-            korean_category_dir = os.path.join(korean_bin_dir, korean_category_name)
-            print(f"Found Korean category dir: {korean_category_dir}")
-        
-        # Get all English MP3 files (excluding name files)
-        english_audio_files = []
-        english_name_files = {}
-        if english_category_dir and os.path.exists(english_category_dir):
-            all_english_files = [
-                f for f in os.listdir(english_category_dir)
-                if f.lower().endswith(".mp3") and os.path.isfile(os.path.join(english_category_dir, f))
-            ]
-            
-            # Separate regular sound files from name files
-            for f in all_english_files:
-                if "_name.mp3" in f:
-                    # Store name files separately, keyed by their index
-                    if len(f) > 3 and f[:3].isdigit():
-                        english_name_files[f[:3]] = f
-                elif f.lower().endswith(".mp3"):
-                    english_audio_files.append(f)
-                    
-            print(f"Found {len(english_audio_files)} English sound files and {len(english_name_files)} name files for {base_category}")
-        
-        # Get all Korean MP3 files (excluding name files)
-        korean_audio_files = []
-        korean_name_files = {}
-        if korean_category_dir and os.path.exists(korean_category_dir):
-            all_korean_files = [
-                f for f in os.listdir(korean_category_dir)
-                if f.lower().endswith(".mp3") and os.path.isfile(os.path.join(korean_category_dir, f))
-            ]
-            
-            # Separate regular sound files from name files
-            for f in all_korean_files:
-                if "_name.mp3" in f:
-                    # Store name files separately, keyed by their index
-                    if len(f) > 3 and f[:3].isdigit():
-                        korean_name_files[f[:3]] = f
-                elif f.lower().endswith(".mp3"):
-                    korean_audio_files.append(f)
-                    
-            print(f"Found {len(korean_audio_files)} Korean sound files and {len(korean_name_files)} name files for {base_category}")
-        
-        # Create an index-based mapping for both English and Korean files
-        english_file_map = {}
-        for file in english_audio_files:
-            if len(file) > 3 and file[:3].isdigit():
-                index = file[:3]  # First 3 characters
-                english_file_map[index] = file
-        
-        korean_file_map = {}
-        for file in korean_audio_files:
-            if len(file) > 3 and file[:3].isdigit():
-                index = file[:3]  # First 3 characters
-                korean_file_map[index] = file
-        
-        # Process all indexes found in either English or Korean files
-        all_indexes = set(list(english_file_map.keys()) + list(korean_file_map.keys()))
-        
-        for index in sorted(all_indexes):
-            english_file = english_file_map.get(index)
-            korean_file = korean_file_map.get(index)
-            english_name_file = english_name_files.get(index)
-            korean_name_file = korean_name_files.get(index)
-            
-            # Create a new entry for this index
-            entry = {
-                "index": index,
-                "english": "",
-                "korean": "",
-                "audioEn": "",
-                "audioKo": "",
-                "audioEnName": "",
-                "audioKoName": ""
-            }
-            
-            # Add English information if available
-            if english_file:
-                english_word = extract_word(english_file)
-                entry["english"] = english_word
-                entry["audioEn"] = f"{ENGLISH_DIR}/{BIN_NAME}/{english_category_name}/{english_file}"
+        # English alphabet files
+        english_category_file = os.path.join(CATEGORIES_DIR, BIN_NAME, f"english_{category}.txt")
+        if os.path.exists(english_category_file):
+            with open(english_category_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
                 
-                # Add English name file if available
-                if english_name_file:
-                    entry["audioEnName"] = f"{ENGLISH_DIR}/{BIN_NAME}/{english_category_name}/{english_name_file}"
-            
-            # Add Korean information if available
-            if korean_file:
-                korean_word = extract_word(korean_file)
-                entry["korean"] = korean_word
-                entry["audioKo"] = f"{KOREAN_DIR}/{BIN_NAME}/{korean_category_name}/{korean_file}"
-                
-                # Add Korean name file if available
-                if korean_name_file:
-                    entry["audioKoName"] = f"{KOREAN_DIR}/{BIN_NAME}/{korean_category_name}/{korean_name_file}"
-            
-            # Add to config
-            config["words"][base_category].append(entry)
+                for index, line in enumerate(lines):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    
+                    # Format should be "letter, pronunciation"
+                    parts = line.split(',', 1)
+                    english_letter = parts[0].strip()
+                    # Use the pronunciation if available, otherwise use the letter
+                    english_pronunciation = parts[1].strip() if len(parts) > 1 else english_letter
+                    
+                    # Generate audio paths
+                    index_str = f"{index:03d}"
+                    
+                    entry = {
+                        "index": index_str,
+                        "english": english_letter,
+                        "english_pronunciation": english_pronunciation,
+                        "korean": "",
+                        "korean_pronunciation": "",
+                        "audioEn": f"English/Alphabet/english_{category}/{index_str}_{english_letter}.mp3",
+                        "audioEnName": f"English/Alphabet/english_{category}/{index_str}_{english_letter}_name.mp3",
+                        "audioKo": "",
+                        "audioKoName": ""
+                    }
+                    
+                    config["words"][category].append(entry)
         
-        print(f"Added {len(all_indexes)} entries for category '{base_category}'")
-
-    # Write the configuration to a file
-    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+        # Korean alphabet files
+        korean_category_file = os.path.join(CATEGORIES_DIR, BIN_NAME, f"korean_{category}.txt")
+        if os.path.exists(korean_category_file):
+            with open(korean_category_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                
+                for index, line in enumerate(lines):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    
+                    # Format should be "letter, pronunciation"
+                    parts = line.split(',', 1)
+                    korean_letter = parts[0].strip()
+                    # Use the pronunciation if available, otherwise use the letter
+                    korean_pronunciation = parts[1].strip() if len(parts) > 1 else korean_letter
+                    
+                    # Generate audio paths
+                    index_str = f"{index:03d}"
+                    
+                    # Check if we already have an entry at this index
+                    if index < len(config["words"][category]):
+                        # Update existing entry with Korean info
+                        config["words"][category][index]["korean"] = korean_letter
+                        config["words"][category][index]["korean_pronunciation"] = korean_pronunciation
+                        config["words"][category][index]["audioKo"] = f"Korean/Alphabet/korean_{category}/{index_str}_{korean_letter}.mp3"
+                        config["words"][category][index]["audioKoName"] = f"Korean/Alphabet/korean_{category}/{index_str}_{korean_letter}_name.mp3"
+                    else:
+                        # Create new entry with just Korean info
+                        entry = {
+                            "index": index_str,
+                            "english": "",
+                            "english_pronunciation": "",
+                            "korean": korean_letter,
+                            "korean_pronunciation": korean_pronunciation,
+                            "audioEn": "",
+                            "audioEnName": "",
+                            "audioKo": f"Korean/Alphabet/korean_{category}/{index_str}_{korean_letter}.mp3",
+                            "audioKoName": f"Korean/Alphabet/korean_{category}/{index_str}_{korean_letter}_name.mp3"
+                        }
+                        config["words"][category].append(entry)
+    
+    # Write the config to a JSON file
+    with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False, indent=2)
 
     print(f"Configuration file generated successfully: {CONFIG_FILE}")
     print(f"Total categories: {len(config['categories'])}")
     total_words = sum(len(words) for words in config["words"].values())
     print(f"Total word pairs: {total_words}")
-
-
-def extract_word(filename):
-    """
-    Extract the word from a filename like "000_Hello.mp3" -> "Hello"
-    """
-    # Remove the file extension
-    name_without_ext = os.path.splitext(filename)[0]
-
-    # Remove the index prefix (e.g., "000_")
-    if len(name_without_ext) > 4 and name_without_ext[3] == "_":
-        word = name_without_ext[4:]
-    else:
-        word = name_without_ext
-
-    # Replace underscores with spaces
-    word = word.replace("_", " ")
-
-    return word
 
 
 if __name__ == "__main__":

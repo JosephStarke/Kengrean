@@ -920,9 +920,23 @@ function displayQuestion() {
         answersContainer.innerHTML = '';
 
         // Add new answer options
-        const correctOption = gameState.languageMode === 'korean' 
-            ? gameState.currentQuestion.english 
-            : gameState.currentQuestion.korean;
+        let correctOption;
+        
+        // For Alphabet, we need to use the pronunciation mappings
+        if (gameState.selectedBin === 'Alphabet') {
+            if (gameState.languageMode === 'korean') {
+                // For Korean mode, the correct answer is the Korean pronunciation
+                correctOption = gameState.currentQuestion.korean_pronunciation || gameState.currentQuestion.english;
+            } else {
+                // For English mode, the correct answer is the English pronunciation
+                correctOption = gameState.currentQuestion.english_pronunciation || gameState.currentQuestion.korean;
+            }
+        } else {
+            // For Words and Phrases, use the normal language mapping
+            correctOption = gameState.languageMode === 'korean' 
+                ? gameState.currentQuestion.english 
+                : gameState.currentQuestion.korean;
+        }
         
         const incorrectOptions = generateIncorrectOptions(gameState.currentQuestion, getAllSelectedWords());
         const options = shuffleArray([correctOption, ...incorrectOptions]);
@@ -1003,9 +1017,23 @@ function playCurrentWordSound() {
 
 // Check the selected answer
 function checkAnswer(selectedOption) {
-    const correctOption = gameState.languageMode === 'korean' 
-        ? gameState.currentQuestion.english 
-        : gameState.currentQuestion.korean;
+    let correctOption;
+    
+    // For Alphabet, we need to use the pronunciation mappings
+    if (gameState.selectedBin === 'Alphabet') {
+        if (gameState.languageMode === 'korean') {
+            // For Korean mode, the correct answer is the Korean pronunciation
+            correctOption = gameState.currentQuestion.korean_pronunciation || gameState.currentQuestion.english;
+        } else {
+            // For English mode, the correct answer is the English pronunciation
+            correctOption = gameState.currentQuestion.english_pronunciation || gameState.currentQuestion.korean;
+        }
+    } else {
+        // For Words and Phrases, use the normal language mapping
+        correctOption = gameState.languageMode === 'korean' 
+            ? gameState.currentQuestion.english 
+            : gameState.currentQuestion.korean;
+    }
     
     const isCorrect = selectedOption === correctOption;
     
@@ -1199,11 +1227,21 @@ function generateIncorrectOptions(correctWord, allWords) {
     // We need 3 incorrect options
     let incorrectOptions = [];
     
-    // Determine which property (english or korean) to use based on language mode
-    const targetProperty = gameState.languageMode === 'korean' ? 'english' : 'korean';
-    const correctOption = correctWord[targetProperty];
+    // Determine which property to use based on language mode and bin
+    let targetProperty;
     
-    // For the Alphabet bin, we need to make sure Korean letters stay with Korean and English with English
+    if (gameState.selectedBin === 'Alphabet') {
+        // For Alphabet, use pronunciation mappings
+        targetProperty = gameState.languageMode === 'korean' ? 'korean_pronunciation' : 'english_pronunciation';
+    } else {
+        // For Words and Phrases, use normal language mapping
+        targetProperty = gameState.languageMode === 'korean' ? 'english' : 'korean';
+    }
+    
+    const correctOption = correctWord[targetProperty] || 
+        (gameState.languageMode === 'korean' ? correctWord.english : correctWord.korean);
+    
+    // For the Alphabet bin, we need to make sure Korean pronunciations stay with Korean and English with English
     let availableWords;
     
     if (gameState.selectedBin === 'Alphabet') {
@@ -1220,13 +1258,13 @@ function generateIncorrectOptions(correctWord, allWords) {
         if (correctWordCategory) {
             availableWords = gameState.words[correctWordCategory].filter(word => 
                 word.index !== correctWord.index || 
-                word[targetProperty] !== correctOption
+                (word[targetProperty] || '') !== correctOption
             );
         } else {
             // Fallback if category can't be determined
             availableWords = allWords.filter(word => 
                 word.index !== correctWord.index || 
-                word[targetProperty] !== correctOption
+                (word[targetProperty] || '') !== correctOption
             );
         }
     } else {
@@ -1245,7 +1283,8 @@ function generateIncorrectOptions(correctWord, allWords) {
         if (availableWords.length === 0) break;
 
         const randomIndex = Math.floor(Math.random() * availableWords.length);
-        const selectedOption = availableWords[randomIndex][targetProperty];
+        const selectedOption = availableWords[randomIndex][targetProperty] ||
+            (gameState.languageMode === 'korean' ? availableWords[randomIndex].english : availableWords[randomIndex].korean);
         
         // Make sure we don't add duplicates
         if (!incorrectOptions.includes(selectedOption)) {
@@ -1274,14 +1313,14 @@ function generateIncorrectOptions(correctWord, allWords) {
             if (correctWordCategory) {
                 remainingWords = gameState.words[correctWordCategory].filter(word =>
                     word.index !== correctWord.index &&
-                    word[targetProperty] !== correctOption && 
-                    !incorrectOptions.includes(word[targetProperty])
+                    (word[targetProperty] || '') !== correctOption && 
+                    !incorrectOptions.includes(word[targetProperty] || '')
                 );
             } else {
                 remainingWords = allWords.filter(word =>
                     word.index !== correctWord.index &&
-                    word[targetProperty] !== correctOption && 
-                    !incorrectOptions.includes(word[targetProperty])
+                    (word[targetProperty] || '') !== correctOption && 
+                    !incorrectOptions.includes(word[targetProperty] || '')
                 );
             }
         } else {
@@ -1294,7 +1333,10 @@ function generateIncorrectOptions(correctWord, allWords) {
 
         if (remainingWords.length > 0) {
             const randomIndex = Math.floor(Math.random() * remainingWords.length);
-            incorrectOptions.push(remainingWords[randomIndex][targetProperty]);
+            const selectedOption = remainingWords[randomIndex][targetProperty] ||
+                (gameState.languageMode === 'korean' ? remainingWords[randomIndex].english : remainingWords[randomIndex].korean);
+                
+            incorrectOptions.push(selectedOption);
         } else {
             // If we've exhausted all options, just pick something
             let randomWordsPool = gameState.selectedBin === 'Alphabet' ? gameState.words[gameState.selectedCategories[0]] : allWords;
@@ -1303,7 +1345,8 @@ function generateIncorrectOptions(correctWord, allWords) {
             }
             
             const randomWord = randomWordsPool[Math.floor(Math.random() * randomWordsPool.length)];
-            const randomOption = randomWord[targetProperty];
+            const randomOption = randomWord[targetProperty] ||
+                (gameState.languageMode === 'korean' ? randomWord.english : randomWord.korean);
             
             // Avoid adding the correct option or duplicates
             if (randomOption !== correctOption && !incorrectOptions.includes(randomOption)) {
