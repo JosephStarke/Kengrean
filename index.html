@@ -3,14 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kengrean - Korean English Quiz Game</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Kengrean — Learn Korean Through Stories</title>
+    <meta name="description" content="Learn Korean from A0 to A2 with illustrated stories, natural neural voices, and playful practice games.">
+    <meta name="theme-color" content="#E0F7FA">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23A076F9'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='white' font-family='sans-serif'%3E한%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css">
 </head>
 
 <body>
-    <!-- Animated background elements -->
-    <div class="bubble-container">
+    <!-- Soft floating background bubbles -->
+    <div class="bubble-container" aria-hidden="true">
         <div class="bubble bubble-1"></div>
         <div class="bubble bubble-2"></div>
         <div class="bubble bubble-3"></div>
@@ -18,139 +24,35 @@
         <div class="bubble bubble-5"></div>
     </div>
 
-    <div class="container">
-        <header>
-            <h1 class="game-title">Kengrean</h1>
-            <div class="subtitle">Korean-English Learning Game</div>
-        </header>
+    <header class="topbar">
+        <a class="logo" href="#/learn" aria-label="Kengrean home">
+            <span class="logo-mark" lang="ko">한</span>
+            <span class="logo-text">Kengrean</span>
+        </a>
+        <nav class="nav" aria-label="Main">
+            <a class="nav-link" data-section="learn" href="#/learn"><span>🗺️</span><b>Learn</b></a>
+            <a class="nav-link" data-section="practice" href="#/practice"><span>🎮</span><b>Practice</b></a>
+            <a class="nav-link" data-section="words" href="#/words"><span>📚</span><b>Words</b></a>
+            <a class="nav-link" data-section="me" href="#/me"><span>🙂</span><b>Me</b></a>
+        </nav>
+        <div class="stats" id="stats"></div>
+    </header>
 
-        <div id="setup-screen">
-            <div class="game-options">
-                <div class="option-group">
-                    <div class="option-title">Language Mode</div>
-                    <div class="btn-group">
-                        <button id="mode-korean" class="mode-btn active">Korean → English</button>
-                        <button id="mode-english" class="mode-btn">English → Korean</button>
-                    </div>
-                </div>
+    <main id="app" class="container"></main>
 
-                <div class="option-group">
-                    <div class="option-title">Game Mode</div>
-                    <div class="btn-group game-mode-group">
-                        <button id="game-quiz" class="game-btn active">Quiz</button>
-                        <button id="game-endless" class="game-btn">Endless</button>
-                        <button id="game-timed" class="game-btn">Time Trial</button>
-                        <button id="game-flashcard" class="game-btn">Flash Cards</button>
-                    </div>
-                </div>
-
-                <div class="option-group">
-                    <div class="option-title">Content Type</div>
-                    <div class="btn-group" id="bins-container">
-                        <button class="bin-btn" data-bin="Alphabet">Alphabet</button>
-                        <button class="bin-btn" data-bin="Words">Words</button>
-                        <button class="bin-btn" data-bin="Phrases">Phrases</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="categories-section">
-                <h2>Select Categories</h2>
-                <div class="category-controls">
-                    <button id="select-all" class="control-btn">Select All</button>
-                    <button id="deselect-all" class="control-btn">Deselect All</button>
-                </div>
-                <div class="categories-grid" id="categories-container">
-                    <!-- Categories will be populated here dynamically -->
-                </div>
-            </div>
-
-            <div class="text-center">
-                <button id="start-game" class="start-btn">
-                    Start
-                </button>
-            </div>
-        </div>
-
-        <div id="game-screen" class="game-area">
-            <div class="game-header">
-                <div class="score-display">Score: <span id="score">0</span></div>
-                <div class="progress-display" id="progress-display">Progress: <span id="progress">0/0</span></div>
-                <div class="time-display" id="time-display">Time: <span id="time">60</span>s</div>
-            </div>
-
-            <div class="question-area">
-                <div class="word-display" id="current-word">안녕하세요</div>
-                <button class="play-sound" id="play-sound">
-                    <span class="sound-icon">🔊</span> Play Sound
-                </button>
-            </div>
-
-            <div class="answers-grid" id="answers-container">
-                <!-- Answer options will be populated here -->
-            </div>
-
-            <button class="main-menu-btn">Main Menu</button>
-        </div>
-
-        <div id="results-screen" class="results-area">
-            <h2 class="results-header">Results</h2>
-
-            <div class="results-stats">
-                <div class="stat-item">
-                    <div class="stat-value" id="final-score">0</div>
-                    <div class="stat-label">Final Score</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="accuracy">0%</div>
-                    <div class="stat-label">Accuracy</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="correct-answers">0</div>
-                    <div class="stat-label">Correct Answers</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="total-questions">0</div>
-                    <div class="stat-label">Total Questions</div>
-                </div>
-            </div>
-
-            <div class="results-buttons">
-                <button id="play-again" class="play-again-btn">Play Again?</button>
-                <button class="main-menu-btn menu-btn">Main Menu</button>
-            </div>
-        </div>
-
-        <div id="flashcard-screen" class="flashcard-area">
-            <div class="game-header">
-                <div class="flashcard-progress">Cards: <span id="card-progress">0/0</span></div>
-                <div class="flashcard-correct">Correct: <span id="correct-cards">0</span></div>
-            </div>
-
-            <div class="flashcard-container">
-                <div class="flashcard" id="flashcard">
-                    <div class="flashcard-front" id="flashcard-front"></div>
-                    <div class="flashcard-back" id="flashcard-back"></div>
-                </div>
-            </div>
-
-            <div class="flashcard-controls">
-                <button class="play-sound" id="flashcard-play-sound">
-                    <span class="sound-icon">🔊</span> Play Sound
-                </button>
-                <button class="flip-card-btn" id="flip-card">Flip Card</button>
-            </div>
-
-            <div class="flashcard-navigation">
-                <button class="incorrect-btn" id="mark-incorrect">❌ Incorrect</button>
-                <button class="correct-btn" id="mark-correct">✓ Correct</button>
-            </div>
-
-            <button class="main-menu-btn">Main Menu</button>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/hangul.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="content/cast.js"></script>
+    <script src="content/a0.js"></script>
+    <script src="content/a1.js"></script>
+    <script src="content/a2.js"></script>
+    <script src="content/wordbank.js"></script>
+    <script src="audio/manifest.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/learn.js"></script>
+    <script src="js/games.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>
