@@ -7,3 +7,4 @@
 - Images: `node tools/gen_images.mjs sheet|scenes` via the OpenAI Images API
   (gpt-image-2.5-flare / gpt-image-2.5-sunburst), 1152×768 WebP, key from `OPENAI_API_KEY`.
 - Local server for testing: `python -m http.server 8765` (also `.claude/launch.json`).
+- Hosting: Netlify project `kengrean` at https://kengrean.netlify.app, auto-deployed from `main` (deploy previews on pull requests). No GitHub Pages, no build step.

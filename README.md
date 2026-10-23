@@ -39,7 +39,11 @@ Plus 20 topic word packs (animals, food, clothes, feelings, …).
 
 ## Run it
 
-It's a static site — open `index.html` or serve the folder:
+Live at **https://kengrean.netlify.app**. Netlify (project `kengrean`) deploys the repo root
+automatically on every push or merge to `main`, and builds a deploy preview for each pull
+request. There is no build step, no `netlify.toml`, and no GitHub Pages site.
+
+Locally it's a static site — open `index.html` or serve the folder:
 
 ```bash
 python -m http.server 8765

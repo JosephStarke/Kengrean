@@ -30,6 +30,14 @@ alwaysApply: true
 - Each cast member has a fixed voice in `content/cast.js`; keep `voiceKey` in `js/audio.js` and `tools/extract_tts.mjs` identical.
 - New story scenes: `node tools/gen_images.mjs scenes <unit-id>` (uses `OPENAI_API_KEY`; never print or commit the key). The cast sheet `img/ref/cast-sheet.png` keeps characters consistent.
 
+# Git Workflow
+- When a change is finished and verified, commit, push and merge it to `main` without asking. Don't ask "should I commit/push/merge?".
+- Still ask before force-pushing, rewriting history, or deleting branches with unmerged work.
+
+# Deployment
+- Hosted on Netlify at https://kengrean.netlify.app (project `kengrean`), auto-deployed from `main`; pull requests get deploy previews.
+- Merging to `main` is a production release. There is no GitHub Pages site and no build step.
+
 # Testing
 - Serve the folder (e.g. `python -m http.server 8765`) and check desktop and a 375px phone width.
 - Check the story player, a full lesson, and each arcade game after changes to `js/`.
