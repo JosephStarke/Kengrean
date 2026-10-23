@@ -1,2 +1,1 @@
-gtts>=2.2.4
-pydub>=0.25.1
+edge-tts>=7.0
