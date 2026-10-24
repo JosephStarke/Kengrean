@@ -20,7 +20,10 @@ KG.app = (() => {
     // =====================
     const routes = [
         [/^#?\/?$/, () => KG.learn.renderPath()],
-        [/^#\/learn(?:\/(A\d))?$/, (lvl) => KG.learn.renderPath(lvl)],
+        [/^#\/learn(?:\/([A-Z]\d?))?$/, (lvl) => KG.learn.renderPath(lvl)],
+        [/^#\/round\/([A-Z]\d?-\d+)$/, (key) => KG.learn.renderRound(key)],
+        [/^#\/recap\/([A-Z]\d?-\d+)$/, (key) => KG.learn.renderRecap(key)],
+        [/^#\/round-quiz\/([A-Z]\d?-\d+)$/, (key) => KG.games.roundQuiz(key)],
         [/^#\/unit\/([\w-]+)$/, (id) => KG.learn.renderUnit(id)],
         [/^#\/story\/([\w-]+)$/, (id) => KG.learn.renderStory(id)],
         [/^#\/letters\/([\w-]+)$/, (id) => KG.learn.renderLetters(id)],
@@ -49,7 +52,7 @@ KG.app = (() => {
     function highlightNav(hash) {
         const section = /^#\/(practice|play)/.test(hash) ? 'practice' : /^#\/words$|^#\/words\/pack/.test(hash) ? 'words' : /^#\/me/.test(hash) ? 'me' : 'learn';
         document.querySelectorAll('.nav-link').forEach((a) => a.classList.toggle('active', a.dataset.section === section));
-        document.body.classList.toggle('in-session', /^#\/(lesson|play)\//.test(hash));
+        document.body.classList.toggle('in-session', /^#\/(lesson|play|round-quiz)\//.test(hash));
     }
 
     // =====================
@@ -134,7 +137,7 @@ KG.app = (() => {
             h('h3.section-title', 'Settings'),
             h('div.settings',
                 row('Daily goal', goalSeg),
-                row('Romanization', seg('romanization', [['auto', 'Hangul only'], ['always', 'Always'], ['never', 'Never']]), 'Latin letters under Korean. Wean off it as soon as you can read Hangul.'),
+                row('Romanization', seg('romanization', [['auto', 'A0 & Hangul'], ['always', 'Always'], ['never', 'Never']]), 'Latin letters under Korean. Turn it off as soon as you can read Hangul.'),
                 row('Story subtitles', seg('subtitles', [['tap', 'KO · tap EN'], ['both', 'KO + EN'], ['off', 'None']])),
                 row('Slow voice', seg('slow', [[false, 'Normal'], [true, '🐢 Slow']])),
                 row('Auto-play audio', seg('autoAudio', [[true, 'On'], [false, 'Off']]), 'Speak words automatically in quizzes and flashcards.'),

@@ -8,11 +8,23 @@ same files to generate audio and image jobs.
 Indent with 4 spaces. Use single quotes for strings; use double quotes when the string
 contains an apostrophe (e.g. `en: "I'm Minji."`).
 
-## Levels
+## Levels (tracks)
 
 ```js
-KG.level({ id: 'A1', title: 'Survival Korean', ko: '생존 한국어', blurb: '...' });
+KG.level({ id: 'A1', title: 'Survival Korean', ko: '생존 한국어', blurb: '...', roundTitles: ['People & things', '…'] });
 ```
+
+Tracks appear in load order: **A0** (Learn Like a Baby — listening only, no reading), **H** (Hangul,
+its own track, `badge: '한'`, `rounds: false`), **A1**, **A2**.
+
+### Rounds and review
+
+Units are grouped into rounds (a unit's `round`, or every four units). After each round the
+path shows a review checkpoint (recap reel of key scenes + a mixed quiz over the whole round),
+unless the round already ends with an episode marked `review: true` — then that episode's
+practice covers the whole round. Every normal lesson also mixes in a few words from earlier
+episodes of the same level (spiral review), weakest first. Write content so words keep coming
+back: recycle earlier vocabulary in later stories, and open episodes with a short review scene.
 
 ## Cast (content/cast.js)
 
@@ -81,7 +93,7 @@ scene or be confused with a cast member.
 ```
 
 - `art`: what the illustration must show so the picture explains the Korean (comprehensible input). Refer to cast by English name (Minji, Alex, Junho, Jian, Grandma, Nabi the cat). Describe setting, action, key objects, expressions. Never ask for text, letters, signs with writing, or speech bubbles.
-- `lines`: 1–3 per scene. Narrator lines describe what is in the picture in simple Korean — they are the core of comprehensible input.
+- `lines`: 1–3 per scene (A0 uses 2–6: introduce a word alone, then in a phrase, then repeat it). Narrator lines describe what is in the picture in simple Korean — they are the core of comprehensible input.
 - `check` (optional, on about half the scenes): a comprehension question in simple Korean. `options` are short Korean answers (2–4); `answer` is the index of the correct one.
 
 ### Pattern
@@ -107,11 +119,11 @@ scene or be confused with a cast member.
 - 2–6 words (space-separated chunks become the tiles in the sentence builder).
 - `blank` (optional but give it on most): an exact substring of `ko` to hide — a particle, ending, or key word that tests this unit's pattern. `alts`: three wrong choices that are plausible but clearly wrong.
 
-## Hangul units (A0)
+## Hangul units (track H)
 
 ```js
 KG.unit({
-    id: 'a0-01', level: 'A0', type: 'hangul',
+    id: 'h-01', level: 'H', type: 'hangul',
     title: 'Simple Vowels', ko: '기본 모음', icon: 'ㅏ',
     goal: '...',
     intro: 'Short friendly explanation shown before the letters.',

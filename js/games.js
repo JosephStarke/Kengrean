@@ -41,6 +41,10 @@ KG.games = (() => {
             const p = KG.packById[id];
             return { title: `${p.icon} ${p.title}`, levelId: p.level, units: [], words: p.words, sentences: [], letters: [], blocks: [], back: `#/words/pack/${p.id}` };
         }
+        if (kind === 'round' && KG.round(id)) {
+            const r = KG.round(id);
+            return { ...fromUnits(r.units, `🔁 ${r.title}`, r.level), back: `#/round/${r.key}` };
+        }
         if (kind === 'level' && KG.levels.some((l) => l.id === id)) {
             return { ...fromUnits(KG.unitsIn(id), `Level ${id}`, id), back: '#/practice' };
         }
@@ -70,16 +74,19 @@ KG.games = (() => {
 
     const romFor = (item) => ui.showRom(levelOf(item));
 
-    // Wrong answers: same kind of item, distinct text and meaning.
+    // Wrong answers: same kind of item, distinct text, meaning and picture
+    // (하나 and 일 share 1️⃣, so they must never appear side by side).
     function distractors(item, pool, n, key) {
         const used = new Set([key(item), item.ko]);
+        const pictures = new Set([item.emoji]);
         const out = [];
         for (const cand of [...shuffle(pool), ...shuffle(allWords())]) {
             if (out.length >= n) break;
             const k = key(cand);
-            if (!k || used.has(k) || used.has(cand.ko)) continue;
+            if (!k || used.has(k) || used.has(cand.ko) || (cand.emoji && pictures.has(cand.emoji))) continue;
             used.add(k);
             used.add(cand.ko);
+            pictures.add(cand.emoji);
             out.push(cand);
         }
         return out;
@@ -266,7 +273,7 @@ KG.games = (() => {
         speed: { name: 'Speed Round', icon: '⚡', desc: '60 seconds. How many?', needs: (s) => s.words.length >= 4 }
     };
 
-    function mixQuestions(src) {
+    function mixQuestions(src, scale = 1) {
         const qs = [];
         const words = src.words;
         if (src.letters.length) {
@@ -279,15 +286,16 @@ KG.games = (() => {
             take(words.filter((w) => w.emoji), 2).forEach((w) => late.push(Q.picture(w, words)));
             return [...shuffle(qs), ...shuffle(late)];
         }
-        const w = take(words, 9);
-        [Q.listen, Q.listen, Q.picture, Q.picture, Q.meaning, Q.meaning, Q.recall, Q.recall, Q.truefalse].forEach((make, i) => {
+        const makers = [Q.listen, Q.listen, Q.picture, Q.picture, Q.meaning, Q.meaning, Q.recall, Q.recall, Q.truefalse];
+        const w = take(words, Math.round(makers.length * scale));
+        w.map((_, i) => makers[i % makers.length]).forEach((make, i) => {
             if (w[i]) qs.push(make(w[i], words));
         });
         const sents = src.sentences;
         if (sents.length) {
-            take(sents.filter((s) => s.blank), 2).forEach((s) => qs.push(Q.blank(s, sents)));
-            take(sents.filter((s) => s.ko.includes(' ')), 2).forEach((s) => qs.push(Q.build(s, sents)));
-            take(sents, 1).forEach((s) => qs.push(Q.dictation(s, sents)));
+            take(sents.filter((s) => s.blank), Math.round(2 * scale)).forEach((s) => qs.push(Q.blank(s, sents)));
+            take(sents.filter((s) => s.ko.includes(' ')), Math.round(2 * scale)).forEach((s) => qs.push(Q.build(s, sents)));
+            take(sents, Math.round(1 * scale)).forEach((s) => qs.push(Q.dictation(s, sents)));
         }
         // Words first (input), then sentences (output): easier start, harder finish.
         const wordQs = shuffle(qs.filter((q) => !['blank', 'build', 'dictation'].includes(q.mode)));
@@ -333,6 +341,7 @@ KG.games = (() => {
             if (q.type === 'choice') renderChoice(q);
             else if (q.type === 'build') renderBuild(q);
             else if (q.type === 'block') renderBlock(q);
+            if (q.review) area.prepend(h('div.review-tag', '🔁 Review — from an earlier episode'));
             if (q.autoplay && q.audio && store.setting('autoAudio')) setTimeout(() => KG.audio.play(q.audio), 250);
         }
 
@@ -864,17 +873,59 @@ KG.games = (() => {
         return start();
     }
 
+    // Spiral review: words from earlier episodes of the same level come back in every
+    // lesson, weakest (or due) first, so nothing learned in a past round fades away.
+    function reviewQuestions(unit, count) {
+        const levelUnits = KG.unitsIn(unit.level);
+        const earlier = levelUnits.slice(0, levelUnits.indexOf(unit));
+        const due = new Set(store.srsDue());
+        const pool = uniqueBy(earlier.flatMap((u) => u.vocab), (w) => w.ko)
+            .map((w) => ({ w, score: (due.has(w.ko) ? -10 : 0) + store.srsStrength(w.ko) + Math.random() * 2 }))
+            .sort((a, b) => a.score - b.score)
+            .slice(0, count)
+            .map((x) => x.w);
+        const all = earlier.flatMap((u) => u.vocab);
+        return pool.map((w, i) => ({ ...[Q.listen, Q.meaning, Q.picture, Q.recall][i % 4](w, all), review: true }));
+    }
+
     function lesson(unitId) {
         const unit = KG.unitById[unitId];
         if (!unit) return KG.app.notFound();
-        const src = resolveSource(`unit:${unitId}`);
+        // A review episode practises its whole round; normal episodes mix in earlier words.
+        const round = unit.review ? KG.roundOf(unit.id) : null;
+        const src = resolveSource(round ? `round:${round.key}` : `unit:${unitId}`);
+        const build = () => {
+            const own = mixQuestions(src, round ? 1.4 : 1);
+            if (round) return own;
+            const review = reviewQuestions(unit, unit.type === 'hangul' ? 2 : 4);
+            // Review questions are spread through the first two thirds of the lesson.
+            review.forEach((q, i) => own.splice(Math.min(own.length, 1 + i * 3), 0, q));
+            return own;
+        };
         const start = () => runSession({
             title: `🎮 ${unit.title}`,
             back: `#/unit/${unit.id}`,
-            questions: mixQuestions(src),
+            questions: build(),
             onFinish: ({ stars }) => {
                 store.markUnit(unit.id, 'stars', stars);
                 store.srsAdd(unit.vocab);
+            },
+            again: () => KG.app.show(start())
+        });
+        return start();
+    }
+
+    function roundQuiz(key) {
+        const round = KG.round(key);
+        if (!round) return KG.app.notFound();
+        const src = resolveSource(`round:${key}`);
+        const start = () => runSession({
+            title: `🔁 Review: ${round.title}`,
+            back: `#/round/${key}`,
+            questions: mixQuestions(src, 1.6),
+            onFinish: ({ stars }) => {
+                store.markRound(key, 'stars', stars);
+                store.srsAdd(src.words);
             },
             again: () => KG.app.show(start())
         });
@@ -908,7 +959,8 @@ KG.games = (() => {
             const due = store.srsDue().length;
             const options = [
                 ['studied', '📚 Everything studied'],
-                ...KG.levels.map((l) => [`level:${l.id}`, `${l.id} · ${l.title}`]),
+                ...KG.levels.map((l) => [`level:${l.id}`, `${l.badge || l.id} · ${l.title}`]),
+                ...KG.levels.flatMap((l) => KG.roundsIn(l.id).map((r) => [`round:${r.key}`, `🔁 ${l.id} Round ${r.n}: ${r.title}`])),
                 ...KG.units.map((u) => [`unit:${u.id}`, `${u.icon} ${u.id.toUpperCase()} ${u.title}`]),
                 ...KG.packs.map((p) => [`pack:${p.id}`, `${p.icon} Pack: ${p.title}`])
             ];
@@ -950,8 +1002,9 @@ KG.games = (() => {
         if (kind === 'unit') return !!KG.unitById[id];
         if (kind === 'pack') return !!KG.packById[id];
         if (kind === 'level') return KG.levels.some((l) => l.id === id);
+        if (kind === 'round') return !!KG.round(id);
         return kind === 'studied';
     }
 
-    return { play, lesson, renderHub, quickGames, resolveSource, allWords };
+    return { play, lesson, roundQuiz, renderHub, quickGames, resolveSource, allWords };
 })();

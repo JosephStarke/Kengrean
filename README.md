@@ -14,7 +14,16 @@ Each unit follows a comprehensible-input loop:
 3. **Patterns** — the grammar behind what you just heard, with examples.
 4. **Practice** — a mixed quiz that earns up to three stars.
 
-A0 teaches Hangul with letter lessons, a syllable **Block Builder**, and real words to sound out.
+**A0 — Learn Like a Baby** needs no reading at all: guessable words (바나나, 피자, 커피…) are
+introduced alone, then in a phrase, then repeated, with yes/no and either/or questions over
+the pictures — the comprehensible-input style of Delicious Korean's A0 series. **Hangul** is
+its own track (letter lessons, a syllable **Block Builder**, real words to sound out) that you
+can start any time.
+
+Words keep coming back: every episode opens with a review, lessons mix in earlier words
+(spiral review), and each round of episodes ends with a review — a recap reel plus a mixed
+quiz, or a dedicated review episode in A0. A **🗣️ Repeat after me** mode in the player pauses
+after each line so you can shadow it.
 
 ### Practice modes
 
@@ -31,11 +40,12 @@ XP, a daily goal, and a day streak are saved in your browser.
 
 | Level | Units |
 |---|---|
-| **A0** Hangul & First Words | vowels, consonants, y-vowels, strong consonants, combined vowels, batchim, first phrases, classroom survival |
+| **A0** Learn Like a Baby | 3 rounds: food & likes, things & places, me & numbers — each ending in a review episode |
+| **한 Hangul** | vowels, consonants, y-vowels, strong consonants, combined vowels, batchim |
 | **A1** Survival Korean | introductions, this/that, family, prices, counting, café, places, present tense, time, location, likes & negation, weekends |
 | **A2** Everyday Korean | past, future, wants, abilities, weather, reasons, shopping, health, subway, suggestions, comparisons, honorifics |
 
-Plus 20 topic word packs (animals, food, clothes, feelings, …).
+Plus topic word packs of the vocabulary beginner classes actually prioritise (survival phrases, core verbs, question words, numbers, time, ordering, getting around, …).
 
 ## Run it
 

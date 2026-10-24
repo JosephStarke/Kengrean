@@ -3,10 +3,10 @@
 KG.ui = (() => {
     const h = KG.h;
 
-    // Romanization: 'auto' shows it only while learning Hangul (A0).
+    // Romanization: 'auto' shows it before Hangul is learned (A0 and the Hangul track).
     function showRom(levelId) {
         const mode = KG.store.setting('romanization');
-        return mode === 'always' || (mode === 'auto' && levelId === 'A0');
+        return mode === 'always' || (mode === 'auto' && (levelId === 'A0' || levelId === 'H'));
     }
 
     function ko(text, { rom = false, cls = '' } = {}) {

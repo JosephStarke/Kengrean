@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-export const CONTENT_FILES = ['cast.js', 'a0.js', 'a1.js', 'a2.js', 'wordbank.js'];
+export const CONTENT_FILES = ['cast.js', 'a0.js', 'hangul.js', 'a1.js', 'a2.js', 'wordbank.js'];
 
 export function loadContent(files = CONTENT_FILES) {
     const data = { cast: {}, levels: [], units: [], packs: [] };

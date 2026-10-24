@@ -33,6 +33,33 @@ const KG = window.KG = {
     nextUnit(unitId) {
         const i = this.units.findIndex((u) => u.id === unitId);
         return this.units[i + 1] || null;
+    },
+
+    // Rounds: units reviewed together. A unit can set `round`; otherwise every four
+    // units make a round. Levels with `rounds: false` (Hangul) have none.
+    roundsIn(levelId) {
+        const level = this.levels.find((l) => l.id === levelId);
+        if (!level || level.rounds === false) return [];
+        const groups = [];
+        this.unitsIn(levelId).forEach((u, i) => {
+            const n = u.round || Math.floor(i / 4) + 1;
+            if (!groups[n - 1]) groups[n - 1] = { level: levelId, n, key: `${levelId}-${n}`, units: [] };
+            groups[n - 1].units.push(u);
+        });
+        return groups.filter(Boolean).map((g) => ({
+            ...g,
+            title: (level.roundTitles || [])[g.n - 1] || `Round ${g.n}`,
+            // A round that ends with its own review episode needs no extra checkpoint.
+            hasReviewEpisode: g.units.some((u) => u.review)
+        }));
+    },
+    round(key) {
+        const [levelId] = key.split('-');
+        return this.roundsIn(levelId).find((r) => r.key === key) || null;
+    },
+    roundOf(unitId) {
+        const unit = this.unitById[unitId];
+        return unit ? this.roundsIn(unit.level).find((r) => r.units.includes(unit)) || null : null;
     }
 };
 
@@ -131,6 +158,7 @@ KG.store = {
             daily: { date: null, xp: 0 },
             goal: 30,
             units: {},
+            rounds: {},
             srs: {},
             best: {},
             settings: { slow: false, subtitles: 'tap', romanization: 'auto', sfx: true, autoAudio: true }
@@ -176,6 +204,15 @@ KG.store = {
         const p = this.unit(id);
         const steps = unit.type === 'hangul' ? [p.story, p.stars > 0] : [p.story, p.words, p.patterns, p.stars > 0];
         return { done: steps.filter(Boolean).length, total: steps.length, stars: p.stars || 0 };
+    },
+    roundProgress(key) {
+        return (this.data.rounds || {})[key] || { recap: false, stars: 0 };
+    },
+    markRound(key, field, value = true) {
+        const progress = { ...this.roundProgress(key) };
+        progress[field] = field === 'stars' ? Math.max(progress.stars || 0, value) : value;
+        this.data.rounds = { ...(this.data.rounds || {}), [key]: progress };
+        this.save();
     },
     started(id) {
         const p = this.data.units[id];

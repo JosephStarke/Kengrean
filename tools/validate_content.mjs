@@ -34,7 +34,9 @@ for (const u of data.units) {
     const scenes = u.story?.scenes || [];
     if (scenes.length < 4) errors.push(`${where}: story needs 4+ scenes`);
     scenes.forEach((s, i) => {
-        if (s.img !== `${u.id}-${i + 1}`) errors.push(`${where}: scene ${i + 1} img should be ${u.id}-${i + 1}`);
+        // Scenes are <unit id>-<n>; an opening review scene may be <unit id>-0.
+        if (!(s.img.startsWith(`${u.id}-`) && /^\d+$/.test(s.img.slice(u.id.length + 1)))) errors.push(`${where}: scene ${i + 1} img should be ${u.id}-<number>`);
+        if (scenes.findIndex((x) => x.img === s.img) !== i) errors.push(`${where}: duplicate img ${s.img}`);
         if (!s.art) errors.push(`${where}: scene ${i + 1} missing art`);
         if (!s.lines?.length) errors.push(`${where}: scene ${i + 1} has no lines`);
         (s.lines || []).forEach((l) => {
