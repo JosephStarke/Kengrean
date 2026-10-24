@@ -431,11 +431,14 @@ KG.learn = (() => {
                 h('div.check-label', '🤔 Quick check'),
                 h('div.check-q', ui.ko(c.q), ui.audioBtn(c.q, { speaker: 'narrator' })),
                 h('div.check-en', c.en),
-                h('div.check-options', c.options.map((o, i) => h('button.check-opt', {
-                    type: 'button',
-                    lang: 'ko',
-                    onclick: (e) => answer(i, e.currentTarget)
-                }, o))));
+                // Each answer can be heard before choosing.
+                h('div.check-options', c.options.map((o, i) => h('div.check-cell',
+                    h('button.check-opt', {
+                        type: 'button',
+                        lang: 'ko',
+                        onclick: (e) => answer(i, e.currentTarget)
+                    }, o),
+                    ui.audioBtn(o, { size: 'sm' })))));
             const layer = h('div.check-layer', box);
             stage.append(layer);
             KG.audio.play(c.q, { speaker: 'narrator' });

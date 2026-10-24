@@ -56,13 +56,27 @@ KG.audio = {
         if (!src) return this.speak(text, rate, token).finally(finish);
         return new Promise((resolve) => {
             const p = this.player;
+            let settled = false;
+            let guard = setTimeout(() => done(), 10000);
             const done = () => {
-                p.onended = p.onerror = null;
+                if (settled) return;
+                settled = true;
+                clearTimeout(guard);
+                p.onended = p.onerror = p.onloadedmetadata = null;
                 resolve(token === this.token);
+            };
+            // Never wait forever on a clip that stalls (slow network, throttled background tab).
+            p.onloadedmetadata = () => {
+                if (!Number.isFinite(p.duration)) return;
+                clearTimeout(guard);
+                guard = setTimeout(done, (p.duration / rate) * 1000 + 1500);
             };
             p.onended = done;
             p.onerror = () => {
-                p.onended = p.onerror = null;
+                if (settled) return;
+                settled = true;
+                clearTimeout(guard);
+                p.onended = p.onerror = p.onloadedmetadata = null;
                 this.speak(text, rate, token).then(resolve);
             };
             p.src = src;
@@ -70,8 +84,8 @@ KG.audio = {
             p.preservesPitch = true;
             p.play().catch(() => {
                 // Autoplay blocked until the first tap: resolve so sequences keep moving.
-                p.onended = p.onerror = null;
-                setTimeout(() => resolve(token === this.token), 400);
+                clearTimeout(guard);
+                guard = setTimeout(done, 400);
             });
         }).finally(finish);
     },
@@ -89,6 +103,7 @@ KG.audio = {
             const ko = speechSynthesis.getVoices().find((v) => v.lang.startsWith('ko'));
             if (ko) u.voice = ko;
             u.onend = u.onerror = () => resolve(token === this.token);
+            setTimeout(() => resolve(token === this.token), 8000);
             speechSynthesis.speak(u);
         });
     },

@@ -22,7 +22,8 @@ KG.games = (() => {
             words: uniqueBy(units.flatMap((u) => u.vocab), (w) => w.ko),
             sentences: uniqueBy(units.flatMap(unitSentences), (s) => s.ko),
             letters: units.flatMap((u) => u.letters || []),
-            blocks: units.flatMap((u) => u.blocks || [])
+            blocks: units.flatMap((u) => u.blocks || []),
+            scenes: units.flatMap((u) => (u.story ? u.story.scenes.map((sc) => ({ ...sc, unitId: u.id })) : []))
         };
     }
 
@@ -39,7 +40,7 @@ KG.games = (() => {
         }
         if (kind === 'pack' && KG.packById[id]) {
             const p = KG.packById[id];
-            return { title: `${p.icon} ${p.title}`, levelId: p.level, units: [], words: p.words, sentences: [], letters: [], blocks: [], back: `#/words/pack/${p.id}` };
+            return { title: `${p.icon} ${p.title}`, levelId: p.level, units: [], words: p.words, sentences: [], letters: [], blocks: [], scenes: [], back: `#/words/pack/${p.id}` };
         }
         if (kind === 'round' && KG.round(id)) {
             const r = KG.round(id);
@@ -56,7 +57,7 @@ KG.games = (() => {
                 const known = all.filter((w) => store.srsStrength(w.ko) >= 0).sort((a, b) => store.srsStrength(a.ko) - store.srsStrength(b.ko));
                 words = uniqueBy([...words, ...known], (w) => w.ko).slice(0, 12);
             }
-            return { title: '🔁 Daily review', levelId: null, units: [], words, sentences: [], letters: [], blocks: [], back: '#/practice', review: true };
+            return { title: '🔁 Daily review', levelId: null, units: [], words, sentences: [], letters: [], blocks: [], scenes: [], back: '#/practice', review: true };
         }
         const src = fromUnits(studiedUnits(), '📚 Everything studied', null);
         return { ...src, back: '#/practice' };
@@ -72,7 +73,6 @@ KG.games = (() => {
         return 'A1';
     }
 
-    const romFor = (item) => ui.showRom(levelOf(item));
 
     // Wrong answers: same kind of item, distinct text, meaning and picture
     // (하나 and 일 share 1️⃣, so they must never appear side by side).
@@ -95,15 +95,22 @@ KG.games = (() => {
     // =====================
     // Question builders
     // =====================
+    // Answer options never show romanization: for loanwords ("pija") it gives the answer away.
+    // Korean options get their own 🔊 instead (see renderChoice).
     function koChoice(w) {
-        return h('span.choice-ko', ui.ko(w.ko, { rom: romFor(w) }));
+        return h('span.choice-ko', ui.ko(w.ko));
+    }
+    function sceneThumb(scene, cls = 'choice-scene') {
+        const img = h(`img.${cls}`, { src: `img/stories/${scene.img}.webp`, alt: '', loading: 'lazy', draggable: 'false' });
+        img.addEventListener('error', () => img.replaceWith(h(`div.${cls}.thumb-fallback`, '🖼️')), { once: true });
+        return img;
     }
     function picChoice(w) {
         return h('span.choice-pic', h('span.choice-emoji', w.emoji || '💬'), h('span.choice-sub', w.en));
     }
 
-    function choiceQ({ mode, item, prompt, options, answer, audio, autoplay = true, reveal, srs }) {
-        return { type: 'choice', mode, item, prompt, options, answer, audio, autoplay, reveal, srs };
+    function choiceQ({ mode, item, prompt, options, answer, audio, autoplay = true, reveal, srs, layout }) {
+        return { type: 'choice', mode, item, prompt, options, answer, audio, autoplay, reveal, srs, layout };
     }
 
     const Q = {
@@ -116,13 +123,53 @@ KG.games = (() => {
                 answer: w.ko, audio: w.ko, reveal: w, srs: w.ko
             });
         },
+        listenMeaning(w, pool) {
+            const opts = shuffle([w, ...distractors(w, pool, 3, (x) => x.en)]);
+            return choiceQ({
+                mode: 'listenMeaning', item: w,
+                prompt: () => h('div.prompt', h('div.prompt-label', 'Listen — what does it mean?'), h('div.prompt-audio', ui.audioBtn(w.ko, { size: 'xl' }), ui.slowBtn(w.ko))),
+                options: opts.map((o) => ({ key: o.ko, node: () => h('span.choice-en', o.en) })),
+                answer: w.ko, audio: w.ko, reveal: w, srs: w.ko
+            });
+        },
+        // Hear a line from the story, pick the scene it belongs to.
+        scene(scene, scenes) {
+            const said = (text) => scenes.filter((x) => x.lines.some((l) => l.ko === text)).length;
+            const lines = scene.lines.filter((l) => l.ko.replace(/[^가-힣]/g, '').length >= 3 && said(l.ko) === 1);
+            if (!lines.length) return null;
+            const line = lines.find((l) => l.sp === 'narrator') || pick(lines);
+            const others = [
+                ...shuffle(scenes.filter((x) => x !== scene && x.unitId === scene.unitId)),
+                ...shuffle(scenes.filter((x) => x.unitId !== scene.unitId))
+            ].slice(0, 3);
+            if (others.length < 2) return null;
+            return choiceQ({
+                mode: 'scene', item: line, layout: 'scenes',
+                prompt: () => h('div.prompt', h('div.prompt-label', 'Which picture matches what you hear?'),
+                    h('div.prompt-audio', ui.audioBtn(line.ko, { size: 'xl', speaker: line.sp }), ui.slowBtn(line.ko, { speaker: line.sp }))),
+                options: shuffle([scene, ...others]).map((o) => ({ key: o.img, node: () => sceneThumb(o) })),
+                answer: scene.img, audio: line.ko, reveal: { ko: line.ko, en: line.en }
+            });
+        },
+        // The story's own circling question, asked over its picture.
+        storyCheck(scene) {
+            const c = scene.check;
+            return choiceQ({
+                mode: 'storyCheck', item: c,
+                prompt: () => h('div.prompt', h('div.prompt-label', 'Look, listen and answer'), sceneThumb(scene, 'prompt-scene'),
+                    h('div.prompt-audio', ui.audioBtn(c.q, { size: 'xl', speaker: 'narrator' }), ui.slowBtn(c.q, { speaker: 'narrator' }))),
+                options: uniqueBy(c.options, (o) => o).map((o) => ({ key: o, audio: o, node: () => h('span.choice-ko', { lang: 'ko' }, o) })),
+                answer: c.options[c.answer], audio: c.q,
+                reveal: { ko: `${c.q} → ${c.options[c.answer]}`, en: c.en }
+            });
+        },
         picture(w, pool) {
             if (!w.emoji) return Q.recall(w, pool);
             const opts = shuffle([w, ...distractors(w, pool, 3, (x) => x.ko)]);
             return choiceQ({
                 mode: 'picture', item: w,
                 prompt: () => h('div.prompt', h('div.prompt-label', 'Which word matches the picture?'), h('div.prompt-emoji', w.emoji)),
-                options: opts.map((o) => ({ key: o.ko, node: () => koChoice(o) })),
+                options: opts.map((o) => ({ key: o.ko, audio: o.ko, node: () => koChoice(o) })),
                 answer: w.ko, audio: w.ko, autoplay: false, reveal: w, srs: w.ko
             });
         },
@@ -131,7 +178,7 @@ KG.games = (() => {
             return choiceQ({
                 mode: 'meaning', item: w,
                 prompt: () => h('div.prompt', h('div.prompt-label', 'What does this mean?'),
-                    h('div.prompt-ko', ui.ko(w.ko, { rom: romFor(w) }), ui.audioBtn(w.ko)),
+                    h('div.prompt-ko', ui.ko(w.ko), ui.audioBtn(w.ko)),
                     w.polite ? h('div.prompt-polite', { lang: 'ko' }, w.polite) : null),
                 options: opts.map((o) => ({ key: o.ko, node: () => h('span.choice-en', o.en) })),
                 answer: w.ko, audio: w.ko, reveal: w, srs: w.ko
@@ -143,7 +190,7 @@ KG.games = (() => {
                 mode: 'recall', item: w,
                 prompt: () => h('div.prompt', h('div.prompt-label', 'How do you say this in Korean?'),
                     h('div.prompt-en', w.emoji ? h('span.inline-emoji', w.emoji) : null, w.en)),
-                options: opts.map((o) => ({ key: o.ko, node: () => koChoice(o) })),
+                options: opts.map((o) => ({ key: o.ko, audio: o.ko, node: () => koChoice(o) })),
                 answer: w.ko, audio: w.ko, autoplay: false, reveal: w, srs: w.ko
             });
         },
@@ -156,12 +203,12 @@ KG.games = (() => {
             const statement = `${KG.hangul.particles.copula(w.ko)}.`;
             return choiceQ({
                 mode: 'truefalse', item: w,
-                prompt: () => h('div.prompt', h('div.prompt-label', 'True or false?'),
+                prompt: () => h('div.prompt', h('div.prompt-label', 'Listen — does it match the picture?'),
                     h('div.prompt-emoji', shown.emoji),
-                    h('div.prompt-ko', ui.ko(statement, { rom: romFor(w) }), ui.audioBtn(statement))),
+                    h('div.prompt-audio', ui.audioBtn(statement, { size: 'xl' }), ui.slowBtn(statement))),
                 options: [
-                    { key: 'true', node: () => h('span.choice-tf', '⭕ ', h('span', { lang: 'ko' }, '맞아요'), h('small', 'true')) },
-                    { key: 'false', node: () => h('span.choice-tf', '❌ ', h('span', { lang: 'ko' }, '아니에요'), h('small', 'false')) }
+                    { key: 'true', audio: '맞아요', node: () => h('span.choice-tf', '⭕ ', h('span', { lang: 'ko' }, '맞아요'), h('small', 'true')) },
+                    { key: 'false', audio: '아니에요', node: () => h('span.choice-tf', '❌ ', h('span', { lang: 'ko' }, '아니에요'), h('small', 'false')) }
                 ],
                 answer: String(isTrue), audio: statement,
                 reveal: { ko: KG.hangul.particles.copula(shown.ko), en: `It's ${shown.en}.`, emoji: shown.emoji },
@@ -177,7 +224,7 @@ KG.games = (() => {
                 prompt: () => h('div.prompt', h('div.prompt-label', 'Fill the gap'),
                     h('div.prompt-sentence', { lang: 'ko' }, s.ko.slice(0, at), h('span.gap', '＿＿'), s.ko.slice(at + s.blank.length)),
                     h('div.prompt-sub', s.en)),
-                options: opts.map((o) => ({ key: o, node: () => h('span.choice-ko', { lang: 'ko' }, o) })),
+                options: opts.map((o) => ({ key: o, audio: o, node: () => h('span.choice-ko', { lang: 'ko' }, o) })),
                 answer: s.blank, audio: s.ko, autoplay: false, reveal: s
             });
         },
@@ -204,7 +251,7 @@ KG.games = (() => {
             return choiceQ({
                 mode: 'letter', item: l,
                 prompt: () => h('div.prompt', h('div.prompt-label', 'Which letter makes this sound?'), h('div.prompt-audio', ui.audioBtn(l.say, { size: 'xl' }))),
-                options: opts.map((o) => ({ key: o.ch, node: () => h('span.choice-letter', { lang: 'ko' }, o.ch) })),
+                options: opts.map((o) => ({ key: o.ch, audio: o.say, node: () => h('span.choice-letter', { lang: 'ko' }, o.ch) })),
                 answer: l.ch, audio: l.say,
                 reveal: { ko: l.ch, en: `${l.rom} — as in ${l.say}` }
             });
@@ -213,7 +260,7 @@ KG.games = (() => {
             const opts = shuffle([l, ...sample(letters, 3, (x) => x.rom === l.rom)]);
             return choiceQ({
                 mode: 'letterRom', item: l,
-                prompt: () => h('div.prompt', h('div.prompt-label', 'What sound does this letter make?'), h('div.prompt-letter', { lang: 'ko' }, l.ch)),
+                prompt: () => h('div.prompt', h('div.prompt-label', 'What sound does this letter make?'), h('div.prompt-letter', { lang: 'ko' }, l.ch), ui.audioBtn(l.say)),
                 options: opts.map((o) => ({ key: o.rom, node: () => h('span.choice-en', o.rom) })),
                 answer: l.rom, audio: l.say, autoplay: false,
                 reveal: { ko: l.ch, en: `${l.rom} — as in ${l.say}` }
@@ -252,18 +299,23 @@ KG.games = (() => {
         return out;
     }
 
+    // `group` decides where a mode appears: listening modes are what A0–A2 lessons use;
+    // reading modes live in the Practice tab and the Hangul track.
     const MODES = {
-        mix: { name: 'Mixed Quiz', icon: '🎲', desc: 'A bit of everything.', needs: (s) => s.words.length >= 2, make: mixQuestions },
-        listen: { name: 'Listen & Pick', icon: '🎧', desc: 'Hear a word, tap its picture.', needs: (s) => s.words.length >= 2, make: (s) => take(wordsOf(s), 10).map((w) => Q.listen(w, s.words)) },
-        picture: { name: 'Picture Match', icon: '🖼️', desc: 'See it, name it in Korean.', needs: (s) => s.words.length >= 2, make: (s) => take(wordsOf(s).filter((w) => w.emoji), 10).map((w) => Q.picture(w, s.words)) },
-        meaning: { name: 'Meaning', icon: '📖', desc: 'Korean → English.', needs: (s) => s.words.length >= 2, make: (s) => take(wordsOf(s), 10).map((w) => Q.meaning(w, s.words)) },
-        recall: { name: 'Say It', icon: '💬', desc: 'English → Korean.', needs: (s) => s.words.length >= 2, make: (s) => take(wordsOf(s), 10).map((w) => Q.recall(w, s.words)) },
-        truefalse: { name: 'True or False', icon: '⭕', desc: 'Does the sentence match the picture?', needs: (s) => s.words.filter((w) => w.pos === 'noun' && w.emoji).length >= 3, make: (s) => take(s.words.filter((w) => w.pos === 'noun' && w.emoji && !w.ko.includes(' ')), 10).map((w) => Q.truefalse(w, s.words)) },
-        blank: { name: 'Fill the Gap', icon: '🧩', desc: 'Pick the missing piece.', needs: (s) => s.sentences.some((x) => x.blank), make: (s) => take(sentOf(s).filter((x) => x.blank), 10).map((x) => Q.blank(x, s.sentences)) },
-        build: { name: 'Sentence Builder', icon: '🧱', desc: 'Tap the tiles into order.', needs: (s) => s.sentences.some((x) => x.ko.includes(' ')), make: (s) => take(sentOf(s).filter((x) => x.ko.includes(' ')), 8).map((x) => Q.build(x, s.sentences)) },
-        dictation: { name: 'Listening', icon: '👂', desc: 'Hear a sentence, pick its meaning.', needs: (s) => s.sentences.length >= 3, make: (s) => take(sentOf(s), 10).map((x) => Q.dictation(x, s.sentences)) },
-        letters: { name: 'Letter Sounds', icon: '🔤', desc: 'Match letters and sounds.', needs: (s) => s.letters.length >= 2, make: (s) => take(s.letters, 10).map((l, i) => (i % 2 ? Q.letterRom(l, s.letters) : Q.letter(l, s.letters))) },
-        blocks: { name: 'Block Builder', icon: '🏗️', desc: 'Build the syllable you hear.', needs: (s) => s.blocks.length >= 3, make: (s) => take(s.blocks, 8).map((b) => Q.block(b, s.blocks)) }
+        ears: { group: 'listening', name: 'Listening Mix', icon: '🎧', desc: 'Everything by ear: words, scenes, questions.', needs: (s) => s.words.length >= 2, make: (s) => listeningMix(s) },
+        listen: { group: 'listening', name: 'Listen & Pick', icon: '👂', desc: 'Hear a word, tap its picture.', needs: (s) => s.words.length >= 2, make: (s) => take(wordsOf(s), 10).map((w) => Q.listen(w, s.words)) },
+        scenes: { group: 'listening', name: 'Scene Match', icon: '🎬', desc: 'Hear a line, pick the picture.', needs: (s) => s.scenes.length >= 3, make: (s) => take(s.scenes, 12).map((x) => Q.scene(x, s.scenes)).filter(Boolean).slice(0, 10) },
+        story: { group: 'listening', name: 'Story Questions', icon: '💬', desc: 'Answer questions about the pictures.', needs: (s) => s.scenes.some((x) => x.check), make: (s) => take(s.scenes.filter((x) => x.check), 10).map(Q.storyCheck) },
+        mix: { group: 'reading', name: 'Mixed Quiz', icon: '🎲', desc: 'A bit of everything, with reading.', needs: (s) => s.words.length >= 2, make: mixQuestions },
+        picture: { group: 'reading', name: 'Picture Match', icon: '🖼️', desc: 'See it, name it in Korean.', needs: (s) => s.words.length >= 2, make: (s) => take(wordsOf(s).filter((w) => w.emoji), 10).map((w) => Q.picture(w, s.words)) },
+        meaning: { group: 'reading', name: 'Meaning', icon: '📖', desc: 'Korean → English.', needs: (s) => s.words.length >= 2, make: (s) => take(wordsOf(s), 10).map((w) => Q.meaning(w, s.words)) },
+        recall: { group: 'reading', name: 'Say It', icon: '💬', desc: 'English → Korean.', needs: (s) => s.words.length >= 2, make: (s) => take(wordsOf(s), 10).map((w) => Q.recall(w, s.words)) },
+        truefalse: { group: 'listening', name: 'True or False', icon: '⭕', desc: 'Does what you hear match the picture?', needs: (s) => s.words.filter((w) => w.pos === 'noun' && w.emoji).length >= 3, make: (s) => take(s.words.filter((w) => w.pos === 'noun' && w.emoji && !w.ko.includes(' ')), 10).map((w) => Q.truefalse(w, s.words)) },
+        blank: { group: 'reading', name: 'Fill the Gap', icon: '🧩', desc: 'Pick the missing piece.', needs: (s) => s.sentences.some((x) => x.blank), make: (s) => take(sentOf(s).filter((x) => x.blank), 10).map((x) => Q.blank(x, s.sentences)) },
+        build: { group: 'reading', name: 'Sentence Builder', icon: '🧱', desc: 'Tap the tiles into order.', needs: (s) => s.sentences.some((x) => x.ko.includes(' ')), make: (s) => take(sentOf(s).filter((x) => x.ko.includes(' ')), 8).map((x) => Q.build(x, s.sentences)) },
+        dictation: { group: 'listening', name: 'Hear a Sentence', icon: '🗣️', desc: 'Hear a sentence, pick its meaning.', needs: (s) => s.sentences.length >= 3, make: (s) => take(sentOf(s), 10).map((x) => Q.dictation(x, s.sentences)) },
+        letters: { group: 'hangul', name: 'Letter Sounds', icon: '🔤', desc: 'Match letters and sounds.', needs: (s) => s.letters.length >= 2, make: (s) => take(s.letters, 10).map((l, i) => (i % 2 ? Q.letterRom(l, s.letters) : Q.letter(l, s.letters))) },
+        blocks: { group: 'hangul', name: 'Block Builder', icon: '🏗️', desc: 'Build the syllable you hear.', needs: (s) => s.blocks.length >= 3, make: (s) => take(s.blocks, 8).map((b) => Q.block(b, s.blocks)) }
     };
 
     const ARCADE = {
@@ -272,6 +324,24 @@ KG.games = (() => {
         bubbles: { name: 'Bubble Pop', icon: '🫧', desc: 'Pop the word you hear!', needs: (s) => s.words.length >= 4 },
         speed: { name: 'Speed Round', icon: '⚡', desc: '60 seconds. How many?', needs: (s) => s.words.length >= 4 }
     };
+
+    // A0–A2 lessons: listening and selecting only — understand by ear, answer by tapping.
+    function listeningMix(src, scale = 1) {
+        const words = src.words;
+        const scenes = src.scenes || [];
+        const n = (k) => Math.max(1, Math.round(k * scale));
+        const early = [
+            ...take(words, n(3)).map((w) => Q.listen(w, words)),
+            ...take(words, n(2)).map((w) => Q.listenMeaning(w, words)),
+            ...take(words.filter((w) => w.pos === 'noun' && w.emoji && !w.ko.includes(' ')), n(2)).map((w) => Q.truefalse(w, words))
+        ];
+        const late = [
+            ...uniqueBy(take(scenes, n(4)), (x) => x.img).map((x) => Q.scene(x, scenes)).filter(Boolean).slice(0, n(3)),
+            ...uniqueBy(take(scenes.filter((x) => x.check), n(3)), (x) => x.img).map(Q.storyCheck),
+            ...(src.sentences.length >= 3 ? take(src.sentences, n(2)).map((x) => Q.dictation(x, src.sentences)) : [])
+        ];
+        return [...shuffle(early), ...shuffle(late)];
+    }
 
     function mixQuestions(src, scale = 1) {
         const qs = [];
@@ -309,7 +379,7 @@ KG.games = (() => {
     function runSession({ title, back, questions, onFinish, again }) {
         const total = questions.length;
         const queue = [...questions];
-        const state = { done: 0, mistakes: 0, combo: 0, bestCombo: 0, xp: 0, current: null, locked: false };
+        const state = { done: 0, mistakes: 0, combo: 0, bestCombo: 0, xp: 0, current: null, locked: false, feedback: 0 };
 
         const bar = h('div.session-bar', ui.progressBar(0, total));
         const comboEl = h('div.combo');
@@ -328,6 +398,7 @@ KG.games = (() => {
         }
 
         function next() {
+            state.feedback++;
             sheet.hidden = true;
             state.locked = false;
             if (!queue.length) return finish();
@@ -346,7 +417,7 @@ KG.games = (() => {
         }
 
         function renderChoice(q) {
-            const grid = h(`div.choices.n${q.options.length}`);
+            const grid = h(`div.choices.n${q.options.length}${q.layout ? '.' + q.layout : ''}`);
             q.options.forEach((o, i) => {
                 const btn = h('button.choice', { type: 'button', dataset: { key: o.key } }, h('span.choice-num', String(i + 1)), o.node());
                 btn.addEventListener('click', () => {
@@ -356,7 +427,8 @@ KG.games = (() => {
                     if (!right) grid.querySelector(`[data-key="${CSS.escape(q.answer)}"]`)?.classList.add('right');
                     answered(q, right);
                 });
-                grid.append(btn);
+                // Every Korean option can be heard before choosing.
+                grid.append(h(`div.choice-cell${o.audio ? '.has-audio' : ''}`, btn, o.audio ? ui.audioBtn(o.audio, { size: 'sm' }) : null));
             });
             area.append(q.prompt(), grid);
         }
@@ -370,7 +442,8 @@ KG.games = (() => {
                 bank.querySelectorAll('.tile').forEach((b) => { b.disabled = placed.some((t) => t.id === Number(b.dataset.id)); });
                 check.disabled = !placed.length;
             };
-            q.tiles.forEach((text, id) => bank.append(h('button.tile', { type: 'button', lang: 'ko', dataset: { id }, onclick: () => { if (state.locked) return; placed.push({ id, text }); redraw(); KG.audio.sfx(''); } }, text)));
+            // Tiles say themselves out loud when placed.
+            q.tiles.forEach((text, id) => bank.append(h('button.tile', { type: 'button', lang: 'ko', dataset: { id }, onclick: () => { if (state.locked) return; placed.push({ id, text }); redraw(); KG.audio.play(text); } }, text)));
             const check = ui.button('Check', () => {
                 if (state.locked) return;
                 const right = placed.map((t) => t.text).join(' ') === q.answer;
@@ -439,22 +512,22 @@ KG.games = (() => {
             showFeedback(q, right);
         }
 
-        function showFeedback(q, right) {
+        // Feedback moves on by itself once the answer has been heard (tap to skip).
+        async function showFeedback(q, right) {
             const r = q.reveal || {};
-            const goOn = ui.button('Continue', next, right ? 'good big' : 'bad big');
+            const token = ++state.feedback;
             sheet.className = `feedback ${right ? 'good' : 'bad'}`;
-            KG.fill(sheet, 
+            KG.fill(sheet,
                 h('div.fb-head', right ? pick(['정답! Correct!', '잘했어요! Nice!', '좋아요! Great!', '맞아요! Right!']) : 'Not quite — here it is:'),
-                r.ko ? h('div.fb-answer', r.emoji ? h('span.inline-emoji', r.emoji) : null, h('span', { lang: 'ko' }, r.ko), q.audio ? ui.audioBtn(q.audio, { size: 'sm' }) : null) : null,
+                r.ko ? h('div.fb-answer', r.emoji ? h('span.inline-emoji', r.emoji) : null, h('span', { lang: 'ko' }, r.ko)) : null,
                 r.en ? h('div.fb-en', r.en) : null,
-                goOn);
+                h('div.fb-timer', h('i', { style: { animationDuration: right ? '1.6s' : '3s' } })));
             sheet.hidden = false;
-            if (q.audio) KG.audio.play(q.audio);
-            goOn.focus({ preventScroll: true });
-            if (right) {
-                const token = state.done;
-                setTimeout(() => { if (state.done === token && !sheet.hidden && document.body.contains(view)) next(); }, 1600);
-            }
+            const started = Date.now();
+            if (q.audio) await KG.audio.play(q.audio);
+            const minimum = right ? 1600 : 3000;
+            await wait(Math.max(right ? 500 : 1200, minimum - (Date.now() - started)));
+            if (token === state.feedback && !sheet.hidden && document.body.contains(view)) next();
         }
 
         function finish() {
@@ -484,7 +557,7 @@ KG.games = (() => {
                 document.removeEventListener('keydown', onKey);
                 return;
             }
-            if (!sheet.hidden && (e.key === 'Enter' || e.key === ' ')) {
+            if (!sheet.hidden && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight')) {
                 e.preventDefault();
                 next();
                 return;
@@ -492,6 +565,7 @@ KG.games = (() => {
             const n = Number(e.key);
             if (!state.locked && n >= 1 && n <= 4) area.querySelectorAll('.choice')[n - 1]?.click();
         }
+        sheet.addEventListener('click', () => { if (!sheet.hidden) next(); });
         document.addEventListener('keydown', onKey);
         setTimeout(next, 0);
         return view;
@@ -521,7 +595,8 @@ KG.games = (() => {
         function face(w, side) {
             const front = state.dir === 'ko' ? 'ko' : state.dir === 'en' ? 'en' : 'pic';
             const kind = side === 'front' ? front : 'full';
-            if (kind === 'ko') return h('div.fc-face', ui.ko(w.ko, { rom: romFor(w), cls: 'xl' }), w.polite ? h('div.word-polite', w.polite) : null);
+            // The front never shows romanization (it would give the meaning away); the back does.
+            if (kind === 'ko') return h('div.fc-face', ui.ko(w.ko, { cls: 'xl' }), w.polite ? h('div.word-polite', w.polite) : null);
             if (kind === 'en') return h('div.fc-face', h('div.fc-en', w.en));
             if (kind === 'pic') return h('div.fc-face', h('div.fc-emoji', w.emoji || '💬'));
             return h('div.fc-face', h('div.fc-emoji.sm', w.emoji || ''), ui.ko(w.ko, { rom: true, cls: 'xl' }), w.polite ? h('div.word-polite', w.polite) : null, h('div.fc-en', w.en), w.note ? h('div.word-note', w.note) : null);
@@ -798,6 +873,7 @@ KG.games = (() => {
                     const right = o.key === q.answer;
                     btn.classList.add(right ? 'right' : 'wrong');
                     store.srsReview(w.ko, right);
+                    KG.audio.play(w.ko);
                     if (right) {
                         state.combo++;
                         state.correct++;
@@ -885,7 +961,8 @@ KG.games = (() => {
             .slice(0, count)
             .map((x) => x.w);
         const all = earlier.flatMap((u) => u.vocab);
-        return pool.map((w, i) => ({ ...[Q.listen, Q.meaning, Q.picture, Q.recall][i % 4](w, all), review: true }));
+        const makers = unit.type === 'hangul' ? [Q.listen, Q.meaning, Q.picture, Q.recall] : [Q.listen, Q.listenMeaning, Q.truefalse];
+        return pool.map((w, i) => ({ ...makers[i % makers.length](w, all), review: true }));
     }
 
     function lesson(unitId) {
@@ -895,7 +972,8 @@ KG.games = (() => {
         const round = unit.review ? KG.roundOf(unit.id) : null;
         const src = resolveSource(round ? `round:${round.key}` : `unit:${unitId}`);
         const build = () => {
-            const own = mixQuestions(src, round ? 1.4 : 1);
+            const make = unit.type === 'hangul' ? mixQuestions : listeningMix;
+            const own = make(src, round ? 1.4 : 1);
             if (round) return own;
             const review = reviewQuestions(unit, unit.type === 'hangul' ? 2 : 4);
             // Review questions are spread through the first two thirds of the lesson.
@@ -922,7 +1000,7 @@ KG.games = (() => {
         const start = () => runSession({
             title: `🔁 Review: ${round.title}`,
             back: `#/round/${key}`,
-            questions: mixQuestions(src, 1.6),
+            questions: listeningMix(src, 1.6),
             onFinish: ({ stars }) => {
                 store.markRound(key, 'stars', stars);
                 store.srsAdd(src.words);
@@ -942,7 +1020,7 @@ KG.games = (() => {
         const key = `unit:${unit.id}`;
         const list = unit.type === 'hangul'
             ? [['blocks', '🏗️', 'Block Builder'], ['letters', '🔤', 'Letter Sounds'], ['flashcards', '🗂️', 'Flashcards'], ['memory', '🃏', 'Memory'], ['bubbles', '🫧', 'Bubble Pop']]
-            : [['flashcards', '🗂️', 'Flashcards'], ['build', '🧱', 'Sentence Builder'], ['dictation', '👂', 'Listening'], ['memory', '🃏', 'Memory'], ['bubbles', '🫧', 'Bubble Pop'], ['speed', '⚡', 'Speed Round'], ['truefalse', '⭕', 'True or False']];
+            : [['ears', '🎧', 'Listening Mix'], ['scenes', '🎬', 'Scene Match'], ['story', '💬', 'Story Questions'], ['listen', '👂', 'Listen & Pick'], ['truefalse', '⭕', 'True or False'], ['dictation', '🗣️', 'Hear a Sentence'], ['bubbles', '🫧', 'Bubble Pop']];
         return list.map(([mode, icon, name]) => ({ icon, name, href: `#/play/${mode}/${key}` }));
     }
 
@@ -978,23 +1056,24 @@ KG.games = (() => {
                 return h(`a.mode-tile${ok ? '' : '.off'}`, ok ? { href: `#/play/${key}/${sourceKey}` } : { 'aria-disabled': 'true', title: 'Not enough material in this source' },
                     h('span.mode-icon', def.icon), h('b', def.name), h('span', def.desc));
             };
-            const quiz = Object.entries(MODES).filter(([k]) => !['letters', 'blocks'].includes(k));
-            const hangul = Object.entries(MODES).filter(([k]) => ['letters', 'blocks'].includes(k));
+            const group = (g) => Object.entries(MODES).filter(([, def]) => def.group === g);
             KG.fill(host, 
                 h('a.review-card', { href: '#/play/mix/review:due' },
                     h('span.review-icon', '🔁'),
                     h('div', h('b', 'Daily review'), h('span', due ? `${due} word${due === 1 ? '' : 's'} ready to review` : 'All caught up — a quick refresher keeps words fresh')),
                     h('span.review-go', due ? String(due) : '✓')),
                 h('div.source-row', h('label', 'Practice from'), select, h('span.source-count', `${src.words.length} words · ${src.sentences.length} sentences`)),
+                h('h3.section-title', '🎧 Listening'),
+                h('div.mode-grid', group('listening').map(tile)),
                 h('h3.section-title', '🕹️ Arcade'),
                 h('div.mode-grid', Object.entries(ARCADE).map(tile)),
-                h('h3.section-title', '🎯 Quiz modes'),
-                h('div.mode-grid', quiz.map(tile)),
+                h('h3.section-title', '📖 Reading & words'),
+                h('div.mode-grid', group('reading').map(tile)),
                 src.letters.length ? h('h3.section-title', '🔤 Hangul') : null,
-                src.letters.length ? h('div.mode-grid', hangul.map(tile)) : null);
+                src.letters.length ? h('div.mode-grid', group('hangul').map(tile)) : null);
         }
         draw();
-        return ui.page({ title: 'Practice', sub: 'Mix it up — every mode works with any lesson or word pack.', icon: '🎮', cls: 'hub' }, host);
+        return ui.page({ title: 'Practice', sub: 'Listening games first — reading games are here too, for any lesson or word pack.', icon: '🎮', cls: 'hub' }, host);
     }
 
     function resolveSourceValid(key) {

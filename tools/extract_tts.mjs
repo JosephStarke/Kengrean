@@ -59,7 +59,13 @@ for (const unit of units) {
         add(sentence.ko, alternate(sentence.ko));
         if (sentence.blank) [sentence.blank, ...sentence.alts].forEach((t) => add(t));
     }
+    // Sentence Builder tiles say themselves when placed (same split as Q.build in js/games.js).
+    const sentences = [...(unit.sentences || []), ...(unit.patterns || []).flatMap((p) => p.examples)];
+    for (const s of sentences) s.ko.split(' ').map((t) => t.replace(/[.,!?…]+$/, '')).forEach((t) => add(t));
 }
+// True/False answer buttons.
+['맞아요', '아니에요'].forEach((t) => add(t));
+
 for (const pack of packs) {
     pack.words.forEach(addWord);
     pack.words.forEach(statement);

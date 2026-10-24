@@ -27,11 +27,18 @@ after each line so you can shadow it.
 
 ### Practice modes
 
-Every mode works with any unit, level, or topic word pack:
+A0–A2 lessons are **listening and selecting only**: hear a word and tap its picture, hear a
+story line and pick the scene, answer the story's own questions about a picture by ear, judge
+true/false by ear, and pick the meaning of a sentence you hear. Answers never show
+romanization, every Korean option has its own 🔊, and feedback moves on by itself.
 
-- Quiz modes: Listen & Pick, Picture Match, Meaning, Say It, True or False, Fill the Gap,
-  Sentence Builder, Listening, Letter Sounds, Block Builder, Mixed Quiz.
-- Arcade: Flashcards (3 directions), Memory Match, Bubble Pop, 60-second Speed Round.
+Reading games stay in the Practice tab (and the Hangul track), and work with any unit, level,
+round or word pack:
+
+- 🎧 Listening: Listening Mix, Listen & Pick, Scene Match, Story Questions, True or False, Hear a Sentence.
+- 🕹️ Arcade: Flashcards (3 directions), Memory Match, Bubble Pop, 60-second Speed Round.
+- 📖 Reading & words: Mixed Quiz, Picture Match, Meaning, Say It, Fill the Gap, Sentence Builder.
+- 🔤 Hangul: Letter Sounds, Block Builder.
 - Daily Review uses spaced repetition (Leitner boxes) across everything you've studied.
 
 XP, a daily goal, and a day streak are saved in your browser.
