@@ -15,6 +15,9 @@ KG.ui = (() => {
             rom ? h('span.rom', KG.hangul.romanize(text)) : null);
     }
 
+    const SPEAKER_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9.2v5.6h3.8l4.9 4V5.2l-4.9 4z" fill="currentColor"/>'
+        + '<path d="M15.6 8.6a4.8 4.8 0 0 1 0 6.8M18.2 6a8.4 8.4 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+
     function audioBtn(text, { speaker, label, size = '', slow } = {}) {
         const btn = h(`button.audio-btn${size ? '.' + size : ''}`, {
             type: 'button',
@@ -24,7 +27,7 @@ KG.ui = (() => {
                 btn.classList.add('playing');
                 KG.audio.play(text, { speaker, slow }).finally(() => btn.classList.remove('playing'));
             }
-        }, h('span.audio-icon', '🔊'), label ? h('span', label) : null);
+        }, h('span.audio-icon', { html: SPEAKER_SVG }), label ? h('span', label) : null);
         return btn;
     }
 
@@ -32,11 +35,12 @@ KG.ui = (() => {
         return h('button.audio-btn.slow', {
             type: 'button',
             'aria-label': `Play ${text} slowly`,
+            title: 'Slow',
             onclick: (e) => {
                 e.stopPropagation();
                 KG.audio.play(text, { ...opts, slow: true });
             }
-        }, '🐢');
+        }, h('span.slow-icon', '🐢'));
     }
 
     function emoji(w, size = '') {

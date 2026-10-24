@@ -39,6 +39,20 @@ KG.audio = {
         return !!this.fileFor(text);
     },
 
+    // Warm the browser cache for clips that are about to play, so they start instantly
+    // and don't stutter while streaming.
+    preloaded: new Set(),
+    preload(items) {
+        for (const item of items) {
+            if (!item) continue;
+            const { text, speaker } = typeof item === 'string' ? { text: item } : item;
+            const src = this.fileFor(text, speaker);
+            if (!src || this.preloaded.has(src)) continue;
+            this.preloaded.add(src);
+            fetch(src).catch(() => this.preloaded.delete(src));
+        }
+    },
+
     stop() {
         this.token++;
         this.player.pause();

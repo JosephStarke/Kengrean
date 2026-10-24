@@ -6,6 +6,32 @@ KG.learn = (() => {
     const store = KG.store;
 
     // =====================
+    // What to do next
+    // =====================
+    function nextStepFor(unit) {
+        const p = store.unit(unit.id);
+        if (unit.type === 'hangul') {
+            if (!p.story) return { icon: '🔤', label: 'Learn the letters', href: `#/letters/${unit.id}` };
+            if (!p.words) return { icon: '📒', label: 'Read real words', href: `#/words/unit/${unit.id}` };
+            if (!(p.stars > 0)) return { icon: '🎮', label: 'Practice', href: `#/lesson/${unit.id}` };
+            return null;
+        }
+        if (!p.story) return { icon: '🎬', label: unit.review ? 'Watch the review episode' : 'Watch the story', href: `#/story/${unit.id}` };
+        if (!p.words) return { icon: '📒', label: 'Learn the words', href: `#/words/unit/${unit.id}` };
+        if (!p.patterns) return { icon: '💡', label: unit.level === 'A0' ? 'Key expressions' : 'Patterns', href: `#/patterns/${unit.id}` };
+        if (!(p.stars > 0)) return { icon: '🎧', label: unit.review ? 'Round quiz' : 'Listening practice', href: `#/lesson/${unit.id}` };
+        return null;
+    }
+
+    function upNext(levelId) {
+        for (const unit of KG.unitsIn(levelId)) {
+            const step = nextStepFor(unit);
+            if (step) return { unit, step };
+        }
+        return null;
+    }
+
+    // =====================
     // Level path
     // =====================
     function currentLevel() {
@@ -80,7 +106,17 @@ KG.learn = (() => {
                 h('div.path-label', h('b', u.title), h('span', { lang: 'ko' }, u.ko), ui.stars(d.stars)));
         }));
 
-        return ui.page({ cls: 'learn' }, tabs, header, path);
+        const up = upNext(levelId);
+        const upCard = up
+            ? h('a.up-next', { href: up.step.href },
+                h('span.up-icon', up.step.icon),
+                h('div.up-text', h('small', 'Up next'), h('b', up.step.label), h('span', `${up.unit.icon} ${up.unit.title}`)),
+                h('span.up-go', '▶'))
+            : h('div.up-next.done',
+                h('span.up-icon', '🏆'),
+                h('div.up-text', h('small', 'Level complete'), h('b', 'Every episode done!'), h('span', 'Pick the next level above, or keep reviewing in Practice.')));
+
+        return ui.page({ cls: 'learn' }, tabs, upCard, header, path);
     }
 
     // =====================
@@ -141,6 +177,7 @@ KG.learn = (() => {
         return h(`a.step-card${done ? '.done' : ''}`, { href },
             h('span.step-icon', icon),
             h('div.step-body', h('b', title), h('span', sub)),
+            h('span.step-next', 'Next'),
             extra || h('span.step-check', done ? '✓' : '›'));
     }
 
@@ -157,8 +194,11 @@ KG.learn = (() => {
             stepCard({ href: `#/story/${unit.id}`, icon: '🎬', title: `Watch: ${unit.story.title}`, sub: `${unit.story.scenes.length} scenes · listen first, guess from the pictures`, done: p.story }),
             stepCard({ href: `#/words/unit/${unit.id}`, icon: '📒', title: 'Words', sub: `${unit.vocab.length} words from the episode`, done: p.words }),
             stepCard({ href: `#/patterns/${unit.id}`, icon: '💡', title: unit.level === 'A0' ? 'Key expressions' : 'Patterns', sub: unit.patterns.map((x) => x.form).join(' · '), done: p.patterns }),
-            stepCard({ href: `#/lesson/${unit.id}`, icon: '🎮', title: unit.review ? 'Round quiz' : 'Practice', sub: unit.review ? 'Questions from every episode in this round' : 'Mixed quiz · earn up to 3 stars', done: p.stars > 0, extra: ui.stars(p.stars) })
+            stepCard({ href: `#/lesson/${unit.id}`, icon: '🎮', title: unit.review ? 'Round quiz' : 'Listening practice', sub: unit.review ? 'Questions from every episode in this round' : 'Listen and tap · earn up to 3 stars', done: p.stars > 0, extra: ui.stars(p.stars) })
         ];
+        // Highlight the one step to do next.
+        const nextStep = nextStepFor(unit);
+        if (nextStep) steps.forEach((card) => { if (card.getAttribute('href') === nextStep.href) card.classList.add('next'); });
         const roundOfUnit = KG.roundOf(unit.id);
         if (unit.review && roundOfUnit) {
             steps.splice(1, 0, stepCard({ href: `#/recap/${roundOfUnit.key}`, icon: '🔁', title: 'Recap reel', sub: 'Key scenes from every episode in this round', done: store.roundProgress(roundOfUnit.key).recap }));
@@ -248,6 +288,7 @@ KG.learn = (() => {
             back: `#/unit/${unit.id}`,
             practiceHref: `#/lesson/${unit.id}`,
             wordsHref: `#/words/unit/${unit.id}`,
+            next: () => nextStepFor(unit),
             onFinish: () => {
                 const firstTime = !store.unit(unit.id).story;
                 store.markUnit(unit.id, 'story');
@@ -257,7 +298,7 @@ KG.learn = (() => {
     }
 
     // The player itself; `unit` only needs id, level, icon, title, vocab and story.
-    function storyView(unit, { back, onFinish, practiceHref, wordsHref }) {
+    function storyView(unit, { back, onFinish, practiceHref, wordsHref, next }) {
         const scenes = unit.story.scenes;
         const rom = ui.showRom(unit.level);
         const forms = vocabForms(unit);
@@ -352,6 +393,8 @@ KG.learn = (() => {
 
         function showScene(i) {
             state.scene = i;
+            // Fetch this scene's and the next scene's voices ahead of time.
+            KG.audio.preload([...scenes[i].lines, ...(scenes[i + 1] ? scenes[i + 1].lines : [])].map((l) => ({ text: l.ko, speaker: l.sp })));
             images.forEach((f, j) => f.classList.toggle('on', j === i));
             dots.querySelectorAll('.scene-dot').forEach((d, j) => {
                 d.classList.toggle('seen', j < i);
@@ -472,8 +515,12 @@ KG.learn = (() => {
                     state.checks ? h('p', `Quick checks: ${state.correct} / ${state.checks}`) : null,
                     h('p.xp-gain', `+${xp} XP`),
                     h('div.finish-actions',
-                        h('a.btn.primary', { href: practiceHref }, '🎮 Practice now'),
-                        wordsHref ? h('a.btn', { href: wordsHref }, '📒 Words') : null,
+                        ...(() => {
+                            const nx = next && next();
+                            return nx
+                                ? [h('a.btn.primary', { href: nx.href }, `${nx.icon} Next: ${nx.label} ›`), nx.href !== practiceHref ? h('a.btn', { href: practiceHref }, '🎧 Practice now') : null]
+                                : [h('a.btn.primary', { href: practiceHref }, '🎧 Practice now'), wordsHref ? h('a.btn', { href: wordsHref }, '📒 Words') : null];
+                        })(),
                         ui.button('🔁 Watch again', () => { layer.remove(); state.answered.clear(); state.line = 0; showScene(0); play(); }))));
             stage.append(layer);
         }
@@ -617,7 +664,7 @@ KG.learn = (() => {
                 store.markUnit(unit.id, 'words');
                 if (firstTime) store.addXp(5);
                 ui.toast(firstTime ? '+5 XP · Words added to your review deck' : 'Words added to review', 'good');
-                location.hash = `#/unit/${unit.id}`;
+                location.hash = (nextStepFor(unit) || { href: `#/unit/${unit.id}` }).href;
             } else {
                 ui.toast('Added to your review deck', 'good');
             }
@@ -662,9 +709,9 @@ KG.learn = (() => {
                 const firstTime = !store.unit(unit.id).patterns;
                 store.markUnit(unit.id, 'patterns');
                 if (firstTime) store.addXp(5);
-                location.hash = `#/lesson/${unit.id}`;
+                location.hash = (nextStepFor(unit) || { href: `#/lesson/${unit.id}` }).href;
             }, 'primary big')));
     }
 
-    return { renderPath, renderRound, renderRecap, renderUnit, renderStory, renderLetters, renderWords, renderPatterns, sayLetter };
+    return { nextStepFor, upNext, renderPath, renderRound, renderRecap, renderUnit, renderStory, renderLetters, renderWords, renderPatterns, sayLetter };
 })();

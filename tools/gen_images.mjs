@@ -24,8 +24,12 @@ const SCENE_SIZE = '1152x768';
 
 const STYLE = 'Warm hand-drawn picture-book illustration for a Korean language-learning story. '
     + 'Clean soft ink outlines, flat gentle colours with a light coloured-pencil texture, a cosy pastel palette '
-    + '(mint, coral, butter yellow, lavender, sky blue), simple uncluttered backgrounds, expressive friendly faces, '
-    + 'and one clear readable action so a beginner understands the moment from the picture alone. '
+    + '(mint, coral, butter yellow, lavender, sky blue), expressive friendly faces. '
+    + 'Keep it SIMPLE and UNCLUTTERED so a beginner instantly sees what is happening: show only the people and '
+    + 'objects the scene describes; make the key action or object large, centred and clearly in focus; use a calm, '
+    + 'minimal background (a plain soft-coloured wall, floor or sky with at most one or two simple hints of the place); '
+    + 'no background crowds or passers-by, no extra food, props, decorations, posters or busy patterns; leave generous '
+    + 'empty space around the subject. '
     + 'Contemporary Korea (Seoul unless the scene says otherwise; N Seoul Tower only in Seoul scenes). One single picture, never a comic strip or collage. Absolutely no words, letters, captions, logos or speech bubbles anywhere in the image; '
     + 'shop signs and screens are blank or use simple icons. Digits appear only if the scene explicitly asks for them.';
 

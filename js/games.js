@@ -109,8 +109,15 @@ KG.games = (() => {
         return h('span.choice-pic', h('span.choice-emoji', w.emoji || '💬'), h('span.choice-sub', w.en));
     }
 
-    function choiceQ({ mode, item, prompt, options, answer, audio, autoplay = true, reveal, srs, layout }) {
-        return { type: 'choice', mode, item, prompt, options, answer, audio, autoplay, reveal, srs, layout };
+    // `ask` = the question's own audio, `tell` = the answer's audio. After answering, both play
+    // in order (question, then answer) before the next question appears.
+    function choiceQ({ mode, item, prompt, options, answer, audio, autoplay = true, reveal, srs, layout, ask, tell }) {
+        return { type: 'choice', mode, item, prompt, options, answer, audio, autoplay, reveal, srs, layout, ask, tell };
+    }
+
+    // "It's a N." for concrete nouns (clips exist for these), so a word answer is heard in a sentence.
+    function statementFor(w) {
+        return w && w.pos === 'noun' && w.emoji && !w.ko.includes(' ') ? `${KG.hangul.particles.copula(w.ko)}.` : null;
     }
 
     const Q = {
@@ -120,7 +127,8 @@ KG.games = (() => {
                 mode: 'listen', item: w,
                 prompt: () => h('div.prompt', h('div.prompt-label', 'What do you hear?'), h('div.prompt-audio', ui.audioBtn(w.ko, { size: 'xl' }), ui.slowBtn(w.ko))),
                 options: opts.map((o) => ({ key: o.ko, node: () => picChoice(o) })),
-                answer: w.ko, audio: w.ko, reveal: w, srs: w.ko
+                answer: w.ko, audio: w.ko, reveal: w, srs: w.ko,
+                ask: [w.ko], tell: [statementFor(w)]
             });
         },
         listenMeaning(w, pool) {
@@ -129,18 +137,31 @@ KG.games = (() => {
                 mode: 'listenMeaning', item: w,
                 prompt: () => h('div.prompt', h('div.prompt-label', 'Listen — what does it mean?'), h('div.prompt-audio', ui.audioBtn(w.ko, { size: 'xl' }), ui.slowBtn(w.ko))),
                 options: opts.map((o) => ({ key: o.ko, node: () => h('span.choice-en', o.en) })),
-                answer: w.ko, audio: w.ko, reveal: w, srs: w.ko
+                answer: w.ko, audio: w.ko, reveal: w, srs: w.ko,
+                ask: [w.ko], tell: [statementFor(w)]
             });
         },
         // Hear a line from the story, pick the scene it belongs to.
         scene(scene, scenes) {
             const said = (text) => scenes.filter((x) => x.lines.some((l) => l.ko === text)).length;
-            const lines = scene.lines.filter((l) => l.ko.replace(/[^가-힣]/g, '').length >= 3 && said(l.ko) === 1);
+            const vocab = (KG.unitById[scene.unitId] || {}).vocab || [];
+            // Words in a line that also name something you can see.
+            const keysOf = (text) => vocab.filter((w) => [w.ko, w.polite, ...(w.forms || [])].some((f) => f && f.length > 1 && text.includes(f)));
+            const lines = scene.lines
+                .filter((l) => l.ko.replace(/[^가-힣]/g, '').length >= 3 && said(l.ko) === 1)
+                .map((l) => ({ l, keys: keysOf(l.ko) }))
+                .sort((a, b) => b.keys.length - a.keys.length || (b.l.sp === 'narrator') - (a.l.sp === 'narrator'));
             if (!lines.length) return null;
-            const line = lines.find((l) => l.sp === 'narrator') || pick(lines);
+            const { l: line, keys } = lines[0];
+            // A distractor is unusable if its picture could also show what the line says
+            // (e.g. milk appears in several scenes): skip any scene that mentions the same things.
+            const english = keys.map((w) => w.en.split(/[\s/(,]+/)[0].toLowerCase().replace(/[^a-z-]/g, '')).filter((x) => x.length > 2);
+            const clashes = (x) => keys.some((w) => x.lines.some((l) => [w.ko, w.polite, ...(w.forms || [])].some((f) => f && f.length > 1 && l.ko.includes(f))))
+                || english.some((e) => new RegExp(`\\b${e}`, 'i').test(x.art));
+            const usable = scenes.filter((x) => x !== scene && x.img !== scene.img && !clashes(x));
             const others = [
-                ...shuffle(scenes.filter((x) => x !== scene && x.unitId === scene.unitId)),
-                ...shuffle(scenes.filter((x) => x.unitId !== scene.unitId))
+                ...shuffle(usable.filter((x) => x.unitId === scene.unitId)),
+                ...shuffle(usable.filter((x) => x.unitId !== scene.unitId))
             ].slice(0, 3);
             if (others.length < 2) return null;
             return choiceQ({
@@ -148,7 +169,8 @@ KG.games = (() => {
                 prompt: () => h('div.prompt', h('div.prompt-label', 'Which picture matches what you hear?'),
                     h('div.prompt-audio', ui.audioBtn(line.ko, { size: 'xl', speaker: line.sp }), ui.slowBtn(line.ko, { speaker: line.sp }))),
                 options: shuffle([scene, ...others]).map((o) => ({ key: o.img, node: () => sceneThumb(o) })),
-                answer: scene.img, audio: line.ko, reveal: { ko: line.ko, en: line.en }
+                answer: scene.img, audio: line.ko, reveal: { ko: line.ko, en: line.en },
+                ask: [{ text: line.ko, speaker: line.sp }], tell: []
             });
         },
         // The story's own circling question, asked over its picture.
@@ -160,7 +182,8 @@ KG.games = (() => {
                     h('div.prompt-audio', ui.audioBtn(c.q, { size: 'xl', speaker: 'narrator' }), ui.slowBtn(c.q, { speaker: 'narrator' }))),
                 options: uniqueBy(c.options, (o) => o).map((o) => ({ key: o, audio: o, node: () => h('span.choice-ko', { lang: 'ko' }, o) })),
                 answer: c.options[c.answer], audio: c.q,
-                reveal: { ko: `${c.q} → ${c.options[c.answer]}`, en: c.en }
+                reveal: { ko: `${c.q} → ${c.options[c.answer]}`, en: c.en },
+                ask: [{ text: c.q, speaker: 'narrator' }], tell: [c.options[c.answer]]
             });
         },
         picture(w, pool) {
@@ -170,7 +193,8 @@ KG.games = (() => {
                 mode: 'picture', item: w,
                 prompt: () => h('div.prompt', h('div.prompt-label', 'Which word matches the picture?'), h('div.prompt-emoji', w.emoji)),
                 options: opts.map((o) => ({ key: o.ko, audio: o.ko, node: () => koChoice(o) })),
-                answer: w.ko, audio: w.ko, autoplay: false, reveal: w, srs: w.ko
+                answer: w.ko, audio: w.ko, autoplay: false, reveal: w, srs: w.ko,
+                ask: [], tell: [w.ko, statementFor(w)]
             });
         },
         meaning(w, pool) {
@@ -181,7 +205,8 @@ KG.games = (() => {
                     h('div.prompt-ko', ui.ko(w.ko), ui.audioBtn(w.ko)),
                     w.polite ? h('div.prompt-polite', { lang: 'ko' }, w.polite) : null),
                 options: opts.map((o) => ({ key: o.ko, node: () => h('span.choice-en', o.en) })),
-                answer: w.ko, audio: w.ko, reveal: w, srs: w.ko
+                answer: w.ko, audio: w.ko, reveal: w, srs: w.ko,
+                ask: [w.ko], tell: [statementFor(w)]
             });
         },
         recall(w, pool) {
@@ -191,7 +216,8 @@ KG.games = (() => {
                 prompt: () => h('div.prompt', h('div.prompt-label', 'How do you say this in Korean?'),
                     h('div.prompt-en', w.emoji ? h('span.inline-emoji', w.emoji) : null, w.en)),
                 options: opts.map((o) => ({ key: o.ko, audio: o.ko, node: () => koChoice(o) })),
-                answer: w.ko, audio: w.ko, autoplay: false, reveal: w, srs: w.ko
+                answer: w.ko, audio: w.ko, autoplay: false, reveal: w, srs: w.ko,
+                ask: [], tell: [w.ko, statementFor(w)]
             });
         },
         truefalse(w, pool) {
@@ -212,7 +238,8 @@ KG.games = (() => {
                 ],
                 answer: String(isTrue), audio: statement,
                 reveal: { ko: KG.hangul.particles.copula(shown.ko), en: `It's ${shown.en}.`, emoji: shown.emoji },
-                srs: w.ko
+                srs: w.ko,
+                ask: [statement], tell: isTrue ? ['맞아요'] : ['아니에요', statementFor(shown)]
             });
         },
         blank(s, pool) {
@@ -225,7 +252,8 @@ KG.games = (() => {
                     h('div.prompt-sentence', { lang: 'ko' }, s.ko.slice(0, at), h('span.gap', '＿＿'), s.ko.slice(at + s.blank.length)),
                     h('div.prompt-sub', s.en)),
                 options: opts.map((o) => ({ key: o, audio: o, node: () => h('span.choice-ko', { lang: 'ko' }, o) })),
-                answer: s.blank, audio: s.ko, autoplay: false, reveal: s
+                answer: s.blank, audio: s.ko, autoplay: false, reveal: s,
+                ask: [], tell: [s.ko]
             });
         },
         dictation(s, pool) {
@@ -236,7 +264,8 @@ KG.games = (() => {
                 mode: 'dictation', item: s,
                 prompt: () => h('div.prompt', h('div.prompt-label', 'Listen — what was said?'), h('div.prompt-audio', ui.audioBtn(s.ko, { size: 'xl' }), ui.slowBtn(s.ko))),
                 options: opts.map((o) => ({ key: o.ko, node: () => h('span.choice-en', o.en) })),
-                answer: s.ko, audio: s.ko, reveal: s
+                answer: s.ko, audio: s.ko, reveal: s,
+                ask: [s.ko], tell: []
             });
         },
         build(s, pool) {
@@ -253,7 +282,8 @@ KG.games = (() => {
                 prompt: () => h('div.prompt', h('div.prompt-label', 'Which letter makes this sound?'), h('div.prompt-audio', ui.audioBtn(l.say, { size: 'xl' }))),
                 options: opts.map((o) => ({ key: o.ch, audio: o.say, node: () => h('span.choice-letter', { lang: 'ko' }, o.ch) })),
                 answer: l.ch, audio: l.say,
-                reveal: { ko: l.ch, en: `${l.rom} — as in ${l.say}` }
+                reveal: { ko: l.ch, en: `${l.rom} — as in ${l.say}` },
+                ask: [l.say], tell: []
             });
         },
         letterRom(l, letters) {
@@ -263,7 +293,8 @@ KG.games = (() => {
                 prompt: () => h('div.prompt', h('div.prompt-label', 'What sound does this letter make?'), h('div.prompt-letter', { lang: 'ko' }, l.ch), ui.audioBtn(l.say)),
                 options: opts.map((o) => ({ key: o.rom, node: () => h('span.choice-en', o.rom) })),
                 answer: l.rom, audio: l.say, autoplay: false,
-                reveal: { ko: l.ch, en: `${l.rom} — as in ${l.say}` }
+                reveal: { ko: l.ch, en: `${l.rom} — as in ${l.say}` },
+                ask: [], tell: [l.say]
             });
         },
         block(target, blocks) {
@@ -376,7 +407,7 @@ KG.games = (() => {
     // =====================
     // Session runner (any list of questions)
     // =====================
-    function runSession({ title, back, questions, onFinish, again }) {
+    function runSession({ title, back, questions, onFinish, again, next: nextAction }) {
         const total = questions.length;
         const queue = [...questions];
         const state = { done: 0, mistakes: 0, combo: 0, bestCombo: 0, xp: 0, current: null, locked: false, feedback: 0 };
@@ -407,6 +438,8 @@ KG.games = (() => {
         }
 
         function renderQuestion(q) {
+            preloadFor(q);
+            preloadFor(queue[0]);
             KG.fill(area);
             area.classList.remove('shake');
             if (q.type === 'choice') renderChoice(q);
@@ -524,10 +557,28 @@ KG.games = (() => {
                 h('div.fb-timer', h('i', { style: { animationDuration: right ? '1.6s' : '3s' } })));
             sheet.hidden = false;
             const started = Date.now();
-            if (q.audio) await KG.audio.play(q.audio);
+            const live = () => token === state.feedback && !sheet.hidden && document.body.contains(view);
+            // Replay the question, then the answer, then move on.
+            for (const clip of feedbackClips(q)) {
+                if (!live()) return;
+                await KG.audio.play(clip.text, { speaker: clip.speaker });
+                await wait(250);
+            }
             const minimum = right ? 1600 : 3000;
-            await wait(Math.max(right ? 500 : 1200, minimum - (Date.now() - started)));
-            if (token === state.feedback && !sheet.hidden && document.body.contains(view)) next();
+            await wait(Math.max(right ? 400 : 1000, minimum - (Date.now() - started)));
+            if (live()) next();
+        }
+
+        function feedbackClips(q) {
+            const norm = (c) => (c && typeof c === 'object' ? c : c ? { text: c } : null);
+            const clips = [...(q.ask || []), ...(q.tell || [])].map(norm).filter(Boolean);
+            return clips.length ? clips : q.audio ? [{ text: q.audio }] : [];
+        }
+
+        // Fetch the clips this question (and the next) will play before they're needed.
+        function preloadFor(q) {
+            if (!q) return;
+            KG.audio.preload([q.audio, ...feedbackClips(q), ...(q.options || []).map((o) => o.audio), ...(q.tiles || [])]);
         }
 
         function finish() {
@@ -547,7 +598,8 @@ KG.games = (() => {
                     h('div', h('b', String(state.bestCombo)), h('span', 'best combo'))),
                 h('div.finish-actions',
                     again ? ui.button('🔁 Play again', again, 'ghost') : null,
-                    h('a.btn.primary', { href: back }, 'Continue ›'))));
+                    nextAction ? h('a.btn', { href: back }, 'Back') : null,
+                    h('a.btn.primary', { href: nextAction ? nextAction.href : back }, nextAction ? nextAction.label : 'Done ›'))));
             sheet.hidden = true;
             KG.fill(bar, ui.progressBar(1, 1));
         }
@@ -980,9 +1032,13 @@ KG.games = (() => {
             review.forEach((q, i) => own.splice(Math.min(own.length, 1 + i * 3), 0, q));
             return own;
         };
+        const following = KG.nextUnit(unit.id);
         const start = () => runSession({
-            title: `🎮 ${unit.title}`,
+            title: `🎧 ${unit.title}`,
             back: `#/unit/${unit.id}`,
+            next: following && following.level === unit.level
+                ? { href: `#/unit/${following.id}`, label: `Next: ${following.icon} ${following.title} ›` }
+                : { href: `#/learn/${unit.level}`, label: 'Back to the path ›' },
             questions: build(),
             onFinish: ({ stars }) => {
                 store.markUnit(unit.id, 'stars', stars);

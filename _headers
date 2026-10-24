@@ -1,0 +1,8 @@
+# Netlify response headers.
+# Audio clips are named by a hash of voice + text, so a file never changes: cache it for good.
+/audio/*.mp3
+  Cache-Control: public, max-age=31536000, immutable
+
+# Illustrations can be redrawn under the same name: cache for a day, refresh in the background.
+/img/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

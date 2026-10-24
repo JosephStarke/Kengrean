@@ -64,10 +64,16 @@ KG.app = (() => {
         const daily = store.dailyXp();
         const goal = store.data.goal;
         const pct = Math.min(100, Math.round((daily / goal) * 100));
-        KG.fill(host, 
+        KG.fill(host,
             h('span.stat', { title: 'Day streak' }, '🔥 ', h('b', String(store.streak()))),
             h('span.stat', { title: 'Total XP' }, '⭐ ', h('b', String(store.data.xp))),
-            h('a.goal-ring', { href: '#/me', title: `Daily goal: ${daily} / ${goal} XP`, style: { '--pct': `${pct}%` } }, h('span', pct >= 100 ? '✓' : `${pct}%`)));
+            // Today's goal as plain numbers, e.g. "Today 10/30 XP", with a small bar.
+            h(`a.goal-pill${pct >= 100 ? '.met' : ''}`, { href: '#/me', title: `Today's goal: ${daily} of ${goal} XP` },
+                h('span.goal-emoji', '🎯'),
+                h('span.goal-label', pct >= 100 ? 'Goal met ✓' : 'Today'),
+                h('b', `${Math.min(daily, goal)}/${goal}`),
+                h('span.goal-xp', 'XP'),
+                h('span.goal-bar', h('i', { style: { width: `${pct}%` } }))));
     }
 
     // =====================
