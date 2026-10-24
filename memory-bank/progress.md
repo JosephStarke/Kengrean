@@ -14,7 +14,4 @@
 
 ## Open
 
-- 94 story scenes still need illustrations (new A0 episodes 10–12 and every A1/A2 opener and
-  review episode). The OpenAI account ran out of credits; after topping up run
-  `node tools/gen_images.mjs scenes` (it skips existing images), QA, commit and push.
-  Until then those scenes show an emoji card.
+- Nothing blocking. All 341 story scenes have illustrations (contact-sheet QA'd).

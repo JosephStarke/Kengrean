@@ -1854,7 +1854,7 @@ KG.unit({
             },
             {
                 img: 'a0-12-2',
-                art: 'A small café kiosk at the edge of a green park. Junho hands a banknote to the smiling barista, who gives him a cup of coffee. Grandma, Minji and Jian wait behind him with the picnic basket.',
+                art: 'A small café kiosk at the edge of a green park. Junho hands a banknote to the smiling barista, who gives him a cup of coffee. Grandma, Minji and Jian wait behind him with the picnic basket. Only these four family members and the barista are in the picture; no young man in a green jacket.',
                 lines: [
                     { sp: 'narrator', ko: '공원 카페예요. 준호는 커피 좋아해요.', en: "It's the park café. Junho likes coffee." },
                     { sp: 'junho', ko: '커피 하나 주세요.', en: 'One coffee, please.' },
@@ -1888,7 +1888,7 @@ KG.unit({
             },
             {
                 img: 'a0-12-5',
-                art: 'Mike, jogging through the park, stops and waves. Jian jumps up and points at him excitedly. Minji stands up and bows politely to Mike.',
+                art: 'Mike, jogging through the park, stops and waves. Jian jumps up and points at him excitedly. Minji stands up and bows politely to Mike. Mike is a man in his thirties with short straight blond hair, a short beard, rectangular glasses and a navy sweater. Nobody in this picture has curly brown hair, a green jacket or a red backpack.',
                 lines: [
                     { sp: 'jian', ko: '저기! 마이크 선생님!', en: 'Over there! Teacher Mike!' },
                     { sp: 'staffM', as: '마이크 선생님', ko: '지안, 안녕하세요!', en: 'Hello, Jian!' },
@@ -1899,7 +1899,7 @@ KG.unit({
             },
             {
                 img: 'a0-12-6',
-                art: 'Mike sits on the picnic mat with the family. Grandma offers him a banana, and Junho holds up his cup of coffee. Mike happily takes the banana but politely waves away the coffee, holding up a bottle of water instead.',
+                art: 'Mike sits on the picnic mat with the family. Grandma offers him a banana, and Junho holds up his cup of coffee. Mike happily takes the banana but politely waves away the coffee, holding up a bottle of water instead. Mike is a man in his thirties with short straight blond hair, a short beard, rectangular glasses and a navy sweater. Nobody in this picture has curly brown hair, a green jacket or a red backpack.',
                 lines: [
                     { sp: 'halmeoni', ko: '선생님, 바나나 먹어요?', en: 'Teacher, would you like a banana?' },
                     { sp: 'staffM', as: '마이크 선생님', ko: '네, 감사합니다! 음, 맛있어요!', en: 'Yes, thank you! Mmm, delicious!' },
@@ -1910,7 +1910,7 @@ KG.unit({
             },
             {
                 img: 'a0-12-7',
-                art: 'Back at the park café kiosk, Jian holds up five fingers to the barista, who is handing over ice-cream cones. A price card shows only the digits 2000. Behind Jian, Grandma, Minji, Junho and Mike wave.',
+                art: 'Back at the park café kiosk, Jian holds up five fingers to the barista, who is handing over ice-cream cones. A price card shows only the digits 2000. Behind Jian, Grandma, Minji, Junho and Mike wave. Mike is a man in his thirties with short straight blond hair, a short beard, rectangular glasses and a navy sweater. Nobody in this picture has curly brown hair, a green jacket or a red backpack.',
                 lines: [
                     { sp: 'jian', ko: '아이스크림 얼마예요?', en: 'How much is the ice cream?' },
                     { sp: 'staffF', as: '점원', ko: '이천 원이에요.', en: "It's 2,000 won." },

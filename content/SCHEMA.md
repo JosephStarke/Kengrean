@@ -92,7 +92,7 @@ scene or be confused with a cast member.
 }
 ```
 
-- `art`: what the illustration must show so the picture explains the Korean (comprehensible input). Refer to cast by English name (Minji, Alex, Junho, Jian, Grandma, Nabi the cat). Describe setting, action, key objects, expressions. Never ask for text, letters, signs with writing, or speech bubbles.
+- `art`: what the illustration must show so the picture explains the Korean (comprehensible input). Refer to cast by English name (Minji, Alex, Junho, Jian, Grandma, Nabi the cat). Describe setting, action, key objects, expressions. Never ask for text, letters, signs with writing, or speech bubbles. Never write a cast member's name in `art` unless they are in the picture: the image tool treats every cast name it finds (Minji, Alex, Junho, Jian, Grandma, Nabi) as present, even in "X is not Alex".
 - `lines`: 1–3 per scene (A0 uses 2–6: introduce a word alone, then in a phrase, then repeat it). Narrator lines describe what is in the picture in simple Korean — they are the core of comprehensible input.
 - `check` (optional, on about half the scenes): a comprehension question in simple Korean. `options` are short Korean answers (2–4); `answer` is the index of the correct one.
 

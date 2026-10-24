@@ -2493,7 +2493,7 @@ KG.unit({
     ],
     story: {
         title: 'Snowman Day',
-        extras: 'The outdoor scenes are in a small neighbourhood park in Seoul near the family home, with bare trees, wooden benches and a little playground, all covered in fresh white snow.',
+        extras: 'The outdoor scenes are in a small neighbourhood park in Seoul near the family home, with bare trees, wooden benches and a little playground, all covered in fresh white snow. Winter story: whenever the friends are outside in the snow they wear warm winter clothes over their usual looks: Alex in his new bright-blue padded coat and red knit beanie, Minji in a cream scarf and mittens over her mustard cardigan, Jian in a puffy navy coat, yellow cap and mittens (no shorts), Junho in a long grey wool coat, Grandma in a long mauve padded coat and knit hat. Indoors they wear their usual outfits',
         scenes: [
             {
                 img: 'a2-r4-1',

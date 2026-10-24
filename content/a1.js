@@ -1159,7 +1159,7 @@ KG.unit({
         scenes: [
             {
                 img: 'a1-r2-1',
-                art: "Afternoon in the family's cozy living room. Jian stands behind the low coffee table, which he has turned into a pretend shop full of potato chips, cup ramen, red apples, juice bottles, a milk carton, a plush toy fish and toy banknotes. He spreads his arms wide in welcome. Nabi the cat sits on the end of the table.",
+                art: "Afternoon in the family's cozy living room. Jian stands behind the low coffee table, which he has turned into a pretend shop full of potato chips, cup ramen, red apples, juice bottles, a milk carton, a plush toy fish and toy banknotes. He spreads his arms wide in welcome. Nabi the cat sits on the end of the table. Only Jian and Nabi are in the picture.",
                 lines: [
                     { sp: 'jian', ko: '어서 오세요! 지안 편의점이에요!', en: "Welcome! This is Jian's convenience store!" },
                     { sp: 'narrator', ko: '여기는 편의점이에요? 아니요, 편의점이 아니에요. 민지 집이에요.', en: "Is this a convenience store? No, it's not a convenience store. It's Minji's home." },
