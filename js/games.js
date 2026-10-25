@@ -233,8 +233,8 @@ KG.games = (() => {
                     h('div.prompt-emoji', shown.emoji),
                     h('div.prompt-audio', ui.audioBtn(statement, { size: 'xl' }), ui.slowBtn(statement))),
                 options: [
-                    { key: 'true', audio: '맞아요', node: () => h('span.choice-tf', '⭕ ', h('span', { lang: 'ko' }, '맞아요'), h('small', 'true')) },
-                    { key: 'false', audio: '아니에요', node: () => h('span.choice-tf', '❌ ', h('span', { lang: 'ko' }, '아니에요'), h('small', 'false')) }
+                    { key: 'true', audio: '맞아요', node: () => h('span.choice-tf', { lang: 'ko' }, '맞아요') },
+                    { key: 'false', audio: '아니에요', node: () => h('span.choice-tf', { lang: 'ko' }, '아니에요') }
                 ],
                 answer: String(isTrue), audio: statement,
                 reveal: { ko: KG.hangul.particles.copula(shown.ko), en: `It's ${shown.en}.`, emoji: shown.emoji },
