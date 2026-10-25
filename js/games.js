@@ -310,7 +310,7 @@ KG.games = (() => {
                 { key: 'jung', label: 'Vowel', options: rowOf('jung', ['ㅏ', 'ㅗ', 'ㅜ', 'ㅣ']) }
             ];
             if (all.some((p) => p.jong)) rows.push({ key: 'jong', label: 'Bottom', options: rowOf('jong', ['', 'ㄴ', 'ㅁ', 'ㅇ']) });
-            return { type: 'block', mode: 'block', item: { ko: target }, rows, answer: target, audio: target, reveal: { ko: target, en: KG.hangul.romanize(target) } };
+            return { type: 'block', mode: 'block', item: { ko: target }, rows, answer: target, audio: target, reveal: { ko: target, en: KG.hangul.romanize(target, { strict: true }) } };
         }
     };
 
